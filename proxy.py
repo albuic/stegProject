@@ -51,16 +51,16 @@ def filter(packet):
     # Here is where the magic happens.
     data = packet.get_payload()
     pkt = IP(data)
-    print("Got a packet ! source ip : " + str(pkt.src))
+    info = "packet : [src.ip: " + str(pkt.src) + ", dst.ip: " + str(pkt.dst) + " ]"
     # if pkt.src == "192.168.1.2":
     if drop_packet:
         # Drop all packets coming from this IP
-        print("Dropped it. Oops")
+        print(info + " Dropped")
         packet.accept()
         drop_packet = False
     else:
         # Let the rest go it's way
-        print("Forwarding it.")
+        print(info + " Forwarded")
         packet.drop()
         drop_packet = True
     # If you want to modify the packet, copy and modify it with scapy then do :
