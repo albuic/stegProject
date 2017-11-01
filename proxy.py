@@ -15,16 +15,16 @@ import math
 
 
 def usage():
-    print("options :                                                                 "
-          "    '-h' or '--help'                                Show this help        "
-          "    '-i <interface>' or '--interface1=<interface>'  Listen on <interface> "
-          "                                                      Default : enp1s0    "
-          "    '-j <interface>' or '--interface2=<interface>'  Listen on <interface> "
-          "                                                      Default : enp5s0    "
-          "    '-p <port>' '--port=<port>'    TODO             Listen on <port>      "
-          "                                                      Default : 80        "
-          "    '-q <queue>' '--queue=<queue>'                  Use queue <queue>     "
-          "                                                      Default : 0         ")
+    print("options :                                                                 \n"
+          "    '-h' or '--help'                                Show this help        \n"
+          "    '-i <interface>' or '--interface1=<interface>'  Listen on <interface> \n"
+          "                                                      Default : enp1s0    \n"
+          "    '-j <interface>' or '--interface2=<interface>'  Listen on <interface> \n"
+          "                                                      Default : enp5s0    \n"
+          "    '-p <port>' '--port=<port>'    TODO             Listen on <port>      \n"
+          "                                                      Default : 80        \n"
+          "    '-q <queue>' '--queue=<queue>'                  Use queue <queue>     \n"
+          "                                                      Default : 0         \n")
 
 
 def set_iptables_rules(interface1, interface2):
