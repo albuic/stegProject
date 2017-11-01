@@ -45,24 +45,20 @@ def remove_iptables_rules():
     os.system("sudo iptables -F")
     os.system("sudo iptables -X")
 
-drop_packet = True
 def filter(packet):
-    global drop_packet
     # Here is where the magic happens.
     data = packet.get_payload()
     pkt = IP(data)
     info = "packet : [src.ip: " + str(pkt.src) + ", dst.ip: " + str(pkt.dst) + " ]"
     # if pkt.src == "192.168.1.2":
-    if drop_packet:
+    if random.choice([True, False]):
         # Drop all packets coming from this IP
         print(info + " Dropped")
-        packet.accept()
-        drop_packet = False
+        packet.drop()
     else:
         # Let the rest go it's way
         print(info + " Forwarded")
-        packet.drop()
-        drop_packet = True
+        packet.accept()
     # If you want to modify the packet, copy and modify it with scapy then do :
     #packet.set_verdict_modified(nfqueue.NF_ACCEPT, str(packet), len(packet))
 
