@@ -102,13 +102,16 @@ def main(argv):
             sys.exit()
         elif opt in ("-i", "--interface1"):
             interface1_name = arg
+            print("Using interface : " + interface1_name)
         elif opt in ("-j", "--interface2"):
             interface2_name = arg
+            print("Using interface : " + interface2_name)
         elif opt in ("-p", "--port"):
             # TODO : filter by port number
             listening_port = arg
         elif opt in ("-q", "--queue"):
             iptables_queue = arg
+            print("Using queue : " + iptables_queue)
 
     # Setting iptables rules
     set_iptables_rules(interface1_name, interface2_name)
