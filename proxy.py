@@ -55,23 +55,32 @@ def filter(packet):
         means = 0
         # Interval with previous packet in 1 and means
         for i in range(1, len(queue)-1):
-            queue[i].append(queue[i][0] - queue[i-1][0])
+            if((len(queue)-1) == i):
+                queue[i].append(queue[i][0] - queue[i-1][0])
+            else:
+                queue[i][1] = queue[i][0] - queue[i-1][0]
             means += queue[i][1]
         means = means / len(queue)
 
         square_sum = 0
         for i in range(1, len(queue)-1):
-            # Difference from means
-            queue[i].append(means - queue[i][1])
-            # Square of previous
-            queue[i].append(queue[i][2]*queue[i][2])
+            if((len(queue)-1) == i):
+                # Difference from means
+                queue[i].append(means - queue[i][1])
+                # Square of previous
+                queue[i].append(queue[i][2]*queue[i][2])
+            else:
+                # Difference from means
+                queue[i][2] = means - queue[i][1]
+                # Square of previous
+                queue[i][3] = queue[i][2]*queue[i][2]
             square_sum += queue[i][3]
         # Standard deviation
         queue[len(queue)-1].append( math.sqrt( abs(square_sum) / (len(queue)-1) ) )
     data = packet.get_payload()
     pkt = IP(data)
     if len(queue) > 1:
-        info = "packet : [src.ip: " + str(pkt.src) + ", dst.ip: " + str(pkt.dst) + " ]" + " ssd= " + queue[len(queue)-1][4]
+        info = "packet : [src.ip: " + str(pkt.src) + ", dst.ip: " + str(pkt.dst) + " ]" + " ssd= " + str(queue[len(queue)-1][4])
     else:
         info = "packet : [src.ip: " + str(pkt.src) + ", dst.ip: " + str(pkt.dst) + " ]"
     print(info)
