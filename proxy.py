@@ -27,9 +27,9 @@ def usage():
           "                                                      Default : 0         \n")
 
 
-def set_iptables_rules(interface1, interface2):
-    iptablesr1 = "sudo iptables -A FORWARD -j NFQUEUE -i " + interface1
-    iptablesr2 = "sudo iptables -A FORWARD -j NFQUEUE -i " + interface2
+def set_iptables_rules(iptables_queue, interface1, interface2):
+    iptablesr1 = "sudo iptables -A FORWARD -j NFQUEUE --queue-num " + iptables_queue + " -i " + interface1
+    iptablesr2 = "sudo iptables -A FORWARD -j NFQUEUE --queue-num " + iptables_queue + " -i " + interface2
 
     print("Adding iptable rules :")
     print(iptablesr1)
@@ -60,7 +60,7 @@ def filter(packet):
             else:
                 queue[i][1] = queue[i][0] - queue[i-1][0]
             means += queue[i][1]
-        means = means / len(queue)
+        means = means / (len(queue)-1)
 
         square_sum = 0
         for i in range(1, len(queue)-1):
@@ -127,7 +127,7 @@ def main(argv):
             print("Using queue : " + str(iptables_queue))
 
     # Setting iptables rules
-    set_iptables_rules(interface1_name, interface2_name)
+    set_iptables_rules(iptables_queue, interface1_name, interface2_name)
 
     nfqueue = NetfilterQueue()
     nfqueue.bind(iptables_queue, filter)
