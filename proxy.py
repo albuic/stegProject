@@ -92,7 +92,11 @@ def main(argv):
     iptables_queue = 0
 
     try:
-        opts, args = getopt.getopt(argv, "hi:j:p:q:", ["help", "interface1=", "interface2=", "port=", "queue="])
+        if argv[0] != "sudo":
+            opts, args = getopt.getopt(argv[1:], "hi:j:p:q:", ["help", "interface1=", "interface2=", "port=", "queue="])
+        else:
+            opts, args = getopt.getopt(argv[2:], "hi:j:p:q:", ["help", "interface1=", "interface2=", "port=", "queue="])
+
     except getopt.GetoptError:
         usage()
         sys.exit(2)
