@@ -115,7 +115,7 @@ def main(argv):
             listening_port = int(arg)
         elif opt in ("-q", "--queue"):
             iptables_queue = int(arg)
-            print("Using queue : " + iptables_queue)
+            print("Using queue : " + str(iptables_queue))
 
     # Setting iptables rules
     set_iptables_rules(interface1_name, interface2_name)
