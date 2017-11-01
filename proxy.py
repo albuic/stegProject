@@ -54,7 +54,7 @@ def filter(packet):
     if len(queue) > 1:
         means = 0
         # Interval with previous packet in 1 and means
-        for i in range(1, len(queue)-1):
+        for i in range(1, len(queue)):
             if((len(queue)-1) == i):
                 queue[i].append(queue[i][0] - queue[i-1][0])
             else:
@@ -63,7 +63,7 @@ def filter(packet):
         means = means / (len(queue)-1)
 
         square_sum = 0
-        for i in range(1, len(queue)-1):
+        for i in range(1, len(queue)):
             if((len(queue)-1) == i):
                 # Difference from means
                 queue[i].append(means - queue[i][1])
