@@ -49,7 +49,6 @@ def filter(packet):
     # Here is where the magic happens.
     millis = int(round(time.time() * 1000))
     queue.append([millis])
-    printf("hello")
     if len(queue) > 10:
         queue.pop(0)
     if len(queue) > 1:
@@ -75,6 +74,7 @@ def filter(packet):
         info = "packet : [src.ip: " + str(pkt.src) + ", dst.ip: " + str(pkt.dst) + " ]" + " ssd= " + queue[len(queue)-1][4]
     else:
         info = "packet : [src.ip: " + str(pkt.src) + ", dst.ip: " + str(pkt.dst) + " ]"
+    print(info)
     packet.accept()
     # if random.choice([True, False]):
     #     print(info + " Dropped")
