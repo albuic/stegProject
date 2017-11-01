@@ -49,14 +49,14 @@ def filter(packet):
     # Here is where the magic happens.
     millis = int(round(time.time() * 1000))
     queue.append([millis])
+    printf("hello")
     if len(queue) > 10:
         queue.pop(0)
     if len(queue) > 1:
         means = 0
         # Interval with previous packet in 1 and means
-        for i in range(0, len(queue)-1):
-            if i > 0:
-                queue[i][1] = queue[i][0] - queue[i-1][0]
+        for i in range(1, len(queue)-1):
+            queue[i][1] = queue[i][0] - queue[i-1][0]
             means += queue[i][1]
         means = means / len(queue)
 
