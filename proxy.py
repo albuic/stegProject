@@ -100,4 +100,4 @@ def main(argv):
         os.system("sudo iptables -X")
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv)
