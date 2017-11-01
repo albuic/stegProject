@@ -19,12 +19,14 @@ import os
 def usage():
     print("options :                                                                 "
           "    '-h' or '--help'                                Show this help        "
-          "    '-i <interface>' or '--interface1 <interface>'  Listen on <interface> "
+          "    '-i <interface>' or '--interface1=<interface>'  Listen on <interface> "
           "                                                      Default : enp1s0    "
-          "    '-j <interface>' or '--interface2 <interface>'  Listen on <interface> "
+          "    '-j <interface>' or '--interface2=<interface>'  Listen on <interface> "
           "                                                      Default : enp5s0    "
-          "    '-p <port>' '--port <port>'    TODO             Listen on <port>      "
-          "                                                      Default : 80        ")
+          "    '-p <port>' '--port=<port>'    TODO             Listen on <port>      "
+          "                                                      Default : 80        "
+          "    '-q <queue>' '--queue=<queue>'                  Use queue <queue>     "
+          "                                                      Default : 0         ")
 
 
 def set_iptables_rules(interface1, interface2):
@@ -63,9 +65,10 @@ def main(argv):
     interface2_name = 'enp5s0'
     listening_port = 80
     local_ip = 0
+    queue = 0
 
     try:
-        opts, args = getopt.getopt(argv, "hi:j:p:", ["help", "interface1=", "interface2=", "port="])
+        opts, args = getopt.getopt(argv, "hi:j:p:q:", ["help", "interface1=", "interface2=", "port=", "queue="])
     except getopt.GetoptError:
         usage()
         sys.exit(2)
@@ -80,10 +83,12 @@ def main(argv):
         elif opt in ("-p", "--port"):
             # TODO : filter by port number
             listening_port = arg
+        elif opt in ("-q", "--queue"):
+            queue = arg
 
     # This is the intercept
     nfqueue = NetfilterQueue()
-    nfqueue.bind(0, filter)
+    nfqueue.bind(queue, filter)
     try:
         nfqueue.run() # Main loop
     except KeyboardInterrupt:
