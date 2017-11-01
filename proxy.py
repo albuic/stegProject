@@ -86,7 +86,7 @@ def main(argv):
         elif opt in ("-i", "--interface1"):
             interface1_name = arg
         elif opt in ("-j", "--interface2"):
-            interface1_name = arg
+            interface2_name = arg
         elif opt in ("-p", "--port"):
             # TODO : filter by port number
             listening_port = arg
