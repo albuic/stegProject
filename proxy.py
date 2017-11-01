@@ -2,10 +2,10 @@
 
 """
     Use scapy to modify packets going through your machine.
-    Based on nfqueue to block packets in the kernel and pass them to scapy for validation
+    Based on NetfilterQueue to block packets in the kernel and pass them to scapy for validation
 """
 
-import nfqueue
+from netfilterqueue import NetfilterQueue
 from scapy.all import *
 import os
 
@@ -28,39 +28,36 @@ os.system(iptablesr2)
 #print("Set ipv4 forward settings : ")
 #os.system("sysctl net.ipv4.ip_forward=1")
 
-def callback(payload):
+def accept_one_on_two(packet):
     # Here is where the magic happens.
     drop_packet = True
-    data = payload.get_data()
+    data = packet.get_payload()
     pkt = IP(data)
     print("Got a packet ! source ip : " + str(pkt.src))
     # if pkt.src == "192.168.1.2":
     if drop_packet:
         # Drop all packets coming from this IP
         print("Dropped it. Oops")
-        payload.set_verdict(nfqueue.NF_DROP)
+        packet.accept()
         drop_packet = False
     else:
         # Let the rest go it's way
         print("Forwarding it.")
-        payload.set_verdict(nfqueue.NF_ACCEPT)
+        packet.drop()
         drop_packet = True
     # If you want to modify the packet, copy and modify it with scapy then do :
-    #payload.set_verdict_modified(nfqueue.NF_ACCEPT, str(packet), len(packet))
+    #packet.set_verdict_modified(nfqueue.NF_ACCEPT, str(packet), len(packet))
 
 
 def main():
     # This is the intercept
-    q = nfqueue.queue()
-    q.open()
-    q.bind(socket.AF_INET)
-    q.set_callback(callback)
-    q.create_queue(0)
+    nfqueue = NetfilterQueue()
+    nfqueue.bind(0, accept_one_on_two)
     try:
-        q.try_run() # Main loop
+        nfqueue.run() # Main loop
     except KeyboardInterrupt:
-        q.unbind(socket.AF_INET)
-        q.close()
+        print('')
+        nfqueue.unbind()
         print("Flushing iptables.")
         # This flushes everything, you might wanna be careful
         os.system("sudo iptables -F")
