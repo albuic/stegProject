@@ -28,9 +28,10 @@ os.system(iptablesr2)
 #print("Set ipv4 forward settings : ")
 #os.system("sysctl net.ipv4.ip_forward=1")
 
+drop_packet = True
+
 def accept_one_on_two(packet):
     # Here is where the magic happens.
-    drop_packet = True
     data = packet.get_payload()
     pkt = IP(data)
     print("Got a packet ! source ip : " + str(pkt.src))
