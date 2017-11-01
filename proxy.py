@@ -112,9 +112,9 @@ def main(argv):
             print("Using interface : " + interface2_name)
         elif opt in ("-p", "--port"):
             # TODO : filter by port number
-            listening_port = arg
+            listening_port = int(arg)
         elif opt in ("-q", "--queue"):
-            iptables_queue = arg
+            iptables_queue = int(arg)
             print("Using queue : " + iptables_queue)
 
     # Setting iptables rules
