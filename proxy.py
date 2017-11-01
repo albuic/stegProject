@@ -28,8 +28,8 @@ def usage():
 
 
 def set_iptables_rules(iptables_queue, interface1, interface2):
-    iptablesr1 = "sudo iptables -A FORWARD -j NFQUEUE --queue-num " + iptables_queue + " -i " + interface1
-    iptablesr2 = "sudo iptables -A FORWARD -j NFQUEUE --queue-num " + iptables_queue + " -i " + interface2
+    iptablesr1 = "sudo iptables -A FORWARD -j NFQUEUE --queue-num " + str(iptables_queue) + " -i " + interface1
+    iptablesr2 = "sudo iptables -A FORWARD -j NFQUEUE --queue-num " + str(iptables_queue) + " -i " + interface2
 
     print("Adding iptable rules :")
     print(iptablesr1)
