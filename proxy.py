@@ -111,7 +111,7 @@ def main(argv):
     set_iptables_rules(interface1_name, interface2_name)
 
     nfqueue = NetfilterQueue()
-    nfqueue.bind(queue, filter)
+    nfqueue.bind(iptables_queue, filter)
     try:
         nfqueue.run()
     except KeyboardInterrupt:
