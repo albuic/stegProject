@@ -39,6 +39,12 @@ def set_iptables_rules(interface1, interface2):
     os.system(iptablesr1)
     os.system(iptablesr2)
 
+def remove_iptables_rules():
+    print("Flushing iptables.")
+    # This flushes everything, you might wanna be careful
+    os.system("sudo iptables -F")
+    os.system("sudo iptables -X")
+
 drop_packet = True
 def filter(packet):
     # Here is where the magic happens.
@@ -86,6 +92,8 @@ def main(argv):
         elif opt in ("-q", "--queue"):
             queue = arg
 
+    # Setting iptables rules
+    set_iptables_rules(interface1_name, interface2_name)
     # This is the intercept
     nfqueue = NetfilterQueue()
     nfqueue.bind(queue, filter)
@@ -94,10 +102,8 @@ def main(argv):
     except KeyboardInterrupt:
         print('')
         nfqueue.unbind()
-        print("Flushing iptables.")
-        # This flushes everything, you might wanna be careful
-        os.system("sudo iptables -F")
-        os.system("sudo iptables -X")
+        # Removing iptables rules
+        remove_iptables_rules()
 
 if __name__ == "__main__":
     main(sys.argv)
