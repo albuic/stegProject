@@ -10,11 +10,9 @@ import sys
 from netfilterqueue import NetfilterQueue
 from scapy.all import *
 import os
+import time
+import math
 
-# All packets that should be filtered :
-
-# If you want to use it as a reverse proxy for your machine
-#iptablesr = "iptables -A OUTPUT -j NFQUEUE"
 
 def usage():
     print("options :                                                                 "
@@ -41,26 +39,46 @@ def set_iptables_rules(interface1, interface2):
 
 def remove_iptables_rules():
     print("Flushing iptables.")
-    # This flushes everything, you might wanna be careful
+    # This flushes everything, be careful
     os.system("sudo iptables -F")
     os.system("sudo iptables -X")
 
+queue = []
 def filter(packet):
+    global queue
     # Here is where the magic happens.
+    millis = int(round(time.time() * 1000))
+    queue.append([millis])
+    if len(queue) > 10:
+        queue.pop(0)
+    if len(queue) > 1:
+        means = 0
+        # Interval with previous packet in 1 and means
+        for i in range(0, len(queue)-1):
+            if i > 0:
+                queue[i][1] = queue[i][0] - queue[i-1][0]
+            means += queue[i][1]
+        means = means / len(queue)
+
+        square_sum = 0
+        for i in range(1, len(queue)-1):
+            # Difference from means
+            queue[i][2] = means - queue[i][1]
+            # Square of previous
+            queue[i][3] = queue[i][2]*queue[i][2]
+            square_sum += queue[i][3]
+        # Standard deviation
+        queue[len(queue)-1][4] = math.root(square_sum / len(queue)-1)
     data = packet.get_payload()
     pkt = IP(data)
-    info = "packet : [src.ip: " + str(pkt.src) + ", dst.ip: " + str(pkt.dst) + " ]"
-    # if pkt.src == "192.168.1.2":
-    if random.choice([True, False]):
-        # Drop all packets coming from this IP
-        print(info + " Dropped")
-        packet.drop()
-    else:
-        # Let the rest go it's way
-        print(info + " Forwarded")
-        packet.accept()
-    # If you want to modify the packet, copy and modify it with scapy then do :
-    #packet.set_verdict_modified(nfqueue.NF_ACCEPT, str(packet), len(packet))
+    info = "packet : [src.ip: " + str(pkt.src) + ", dst.ip: " + str(pkt.dst) + " ]" + " ssd= " + queue[len(queue)-1][4]
+    packet.accept()
+    # if random.choice([True, False]):
+    #     print(info + " Dropped")
+    #     packet.drop()
+    # else:
+    #     print(info + " Forwarded")
+    #     packet.accept()
 
 
 def main(argv):
@@ -68,7 +86,7 @@ def main(argv):
     interface2_name = 'enp5s0'
     listening_port = 80
     local_ip = 0
-    queue = 0
+    iptables_queue = 0
 
     try:
         opts, args = getopt.getopt(argv, "hi:j:p:q:", ["help", "interface1=", "interface2=", "port=", "queue="])
@@ -87,15 +105,15 @@ def main(argv):
             # TODO : filter by port number
             listening_port = arg
         elif opt in ("-q", "--queue"):
-            queue = arg
+            iptables_queue = arg
 
     # Setting iptables rules
     set_iptables_rules(interface1_name, interface2_name)
-    # This is the intercept
+
     nfqueue = NetfilterQueue()
     nfqueue.bind(queue, filter)
     try:
-        nfqueue.run() # Main loop
+        nfqueue.run()
     except KeyboardInterrupt:
         print('')
         nfqueue.unbind()
