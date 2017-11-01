@@ -67,7 +67,7 @@ def filter(packet):
             queue[i].append(queue[i][2]*queue[i][2])
             square_sum += queue[i][3]
         # Standard deviation
-        queue[len(queue)-1].append(math.sqrt(abs(square_sum) / len(queue)-1))
+        queue[len(queue)-1].append( math.sqrt( abs(square_sum) / (len(queue)-1) ) )
     data = packet.get_payload()
     pkt = IP(data)
     if len(queue) > 1:
