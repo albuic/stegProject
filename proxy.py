@@ -5,6 +5,8 @@
     Based on NetfilterQueue to block packets in the kernel and pass them to scapy for validation
 """
 
+import getopt
+import sys
 from netfilterqueue import NetfilterQueue
 from scapy.all import *
 import os
