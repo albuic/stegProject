@@ -71,7 +71,10 @@ def filter(packet):
         queue[len(queue)-1][4] = math.root(square_sum / len(queue)-1)
     data = packet.get_payload()
     pkt = IP(data)
-    info = "packet : [src.ip: " + str(pkt.src) + ", dst.ip: " + str(pkt.dst) + " ]" + " ssd= " + queue[len(queue)-1][4]
+    if len(queue) > 1:
+        info = "packet : [src.ip: " + str(pkt.src) + ", dst.ip: " + str(pkt.dst) + " ]" + " ssd= " + queue[len(queue)-1][4]
+    else:
+        info = "packet : [src.ip: " + str(pkt.src) + ", dst.ip: " + str(pkt.dst) + " ]"
     packet.accept()
     # if random.choice([True, False]):
     #     print(info + " Dropped")
