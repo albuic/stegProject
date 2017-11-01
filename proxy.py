@@ -15,15 +15,18 @@ import os
 #iptablesr = "iptables -A OUTPUT -j NFQUEUE"
 
 # If you want to use it for MITM :
-iptablesr = "iptables -A FORWARD -j NFQUEUE"
+iptablesr1 = "sudo iptables -A FORWARD -j NFQUEUE -i enp1s0"
+iptablesr2 = "sudo iptables -A FORWARD -j NFQUEUE -i enp5s0"
 
 print("Adding iptable rules :")
-print(iptablesr)
-os.system(iptablesr)
+print(iptablesr1)
+print(iptablesr2)
+os.system(iptablesr1)
+os.system(iptablesr2)
 
 # If you want to use it for MITM attacks, set ip_forward=1 :
-print("Set ipv4 forward settings : ")
-os.system("sysctl net.ipv4.ip_forward=1")
+#print("Set ipv4 forward settings : ")
+#os.system("sysctl net.ipv4.ip_forward=1")
 
 def callback(payload):
     # Here is where the magic happens.
@@ -60,8 +63,8 @@ def main():
         q.close()
         print("Flushing iptables.")
         # This flushes everything, you might wanna be careful
-        os.system('iptables -F')
-        os.system('iptables -X')
+        os.system("sudo iptables -F")
+        os.system("sudo iptables -X")
 
 
 if __name__ == "__main__":
