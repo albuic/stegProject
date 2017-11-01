@@ -47,6 +47,7 @@ def remove_iptables_rules():
 
 drop_packet = True
 def filter(packet):
+    global drop_packet
     # Here is where the magic happens.
     data = packet.get_payload()
     pkt = IP(data)
