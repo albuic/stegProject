@@ -14,23 +14,29 @@ import os
 # If you want to use it as a reverse proxy for your machine
 #iptablesr = "iptables -A OUTPUT -j NFQUEUE"
 
-# If you want to use it for MITM :
-iptablesr1 = "sudo iptables -A FORWARD -j NFQUEUE -i enp1s0"
-iptablesr2 = "sudo iptables -A FORWARD -j NFQUEUE -i enp5s0"
+def usage():
+    print("options :                                                                 "
+          "    '-h' or '--help'                                Show this help        "
+          "    '-i <interface>' or '--interface1 <interface>'  Listen on <interface> "
+          "                                                      Default : enp1s0    "
+          "    '-j <interface>' or '--interface2 <interface>'  Listen on <interface> "
+          "                                                      Default : enp5s0    "
+          "    '-p <port>' '--port <port>'    TODO             Listen on <port>      "
+          "                                                      Default : 80        ")
 
-print("Adding iptable rules :")
-print(iptablesr1)
-print(iptablesr2)
-os.system(iptablesr1)
-os.system(iptablesr2)
 
-# If you want to use it for MITM attacks, set ip_forward=1 :
-#print("Set ipv4 forward settings : ")
-#os.system("sysctl net.ipv4.ip_forward=1")
+def set_iptables_rules(interface1, interface2):
+    iptablesr1 = "sudo iptables -A FORWARD -j NFQUEUE -i " + interface1
+    iptablesr2 = "sudo iptables -A FORWARD -j NFQUEUE -i " + interface2
+
+    print("Adding iptable rules :")
+    print(iptablesr1)
+    print(iptablesr2)
+    os.system(iptablesr1)
+    os.system(iptablesr2)
 
 drop_packet = True
-
-def accept_one_on_two(packet):
+def filter(packet):
     # Here is where the magic happens.
     data = packet.get_payload()
     pkt = IP(data)
@@ -50,10 +56,32 @@ def accept_one_on_two(packet):
     #packet.set_verdict_modified(nfqueue.NF_ACCEPT, str(packet), len(packet))
 
 
-def main():
+def main(argv):
+    interface1_name = 'enp1s0'
+    interface2_name = 'enp5s0'
+    listening_port = 80
+    local_ip = 0
+
+    try:
+        opts, args = getopt.getopt(argv, "hi:j:p:", ["help", "interface1=", "interface2=", "port="])
+    except getopt.GetoptError:
+        usage()
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt in ("-h", "--help"):
+            usage()
+            sys.exit()
+        elif opt in ("-i", "--interface1"):
+            interface1_name = arg
+        elif opt in ("-j", "--interface2"):
+            interface1_name = arg
+        elif opt in ("-p", "--port"):
+            # TODO : filter by port number
+            listening_port = arg
+
     # This is the intercept
     nfqueue = NetfilterQueue()
-    nfqueue.bind(0, accept_one_on_two)
+    nfqueue.bind(0, filter)
     try:
         nfqueue.run() # Main loop
     except KeyboardInterrupt:
@@ -63,7 +91,6 @@ def main():
         # This flushes everything, you might wanna be careful
         os.system("sudo iptables -F")
         os.system("sudo iptables -X")
-
 
 if __name__ == "__main__":
     main()
