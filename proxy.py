@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/python3
 
 """
     Use scapy to modify packets going through your machine.
@@ -15,16 +15,17 @@ import math
 
 
 def usage():
-    print("options :                                                                 \n"
-          "    '-h' or '--help'                                Show this help        \n"
-          "    '-i <interface>' or '--interface1=<interface>'  Listen on <interface> \n"
-          "                                                      Default : enp1s0    \n"
-          "    '-j <interface>' or '--interface2=<interface>'  Listen on <interface> \n"
-          "                                                      Default : enp5s0    \n"
-          "    '-p <port>' '--port=<port>'    TODO             Listen on <port>      \n"
-          "                                                      Default : 80        \n"
-          "    '-q <queue>' '--queue=<queue>'                  Use queue <queue>     \n"
-          "                                                      Default : 0         \n")
+    print("options :                                                                    \n"
+          "    '-f <pcap_file>' or '--file=pcap_file'          Using pcap file as input \n"
+          "    '-h' or '--help'                                Show this help           \n"
+          "    '-i <interface>' or '--interface1=<interface>'  Listen on <interface>    \n"
+          "                                                      Default : enp1s0       \n"
+          "    '-j <interface>' or '--interface2=<interface>'  Listen on <interface>    \n"
+          "                                                      Default : enp5s0       \n"
+          "    '-p <port>' '--port=<port>'    TODO             Listen on <port>         \n"
+          "                                                      Default : 80           \n"
+          "    '-q <queue>' '--queue=<queue>'                  Use queue <queue>        \n"
+          "                                                      Default : 0            \n")
 
 
 def set_iptables_rules(iptables_queue, interface1, interface2):
@@ -43,15 +44,21 @@ def remove_iptables_rules():
     os.system("sudo iptables -F")
     os.system("sudo iptables -X")
 
-queue = []
 def filter(packet):
-    global queue
     # Here is where the magic happens.
     millis = int(round(time.time() * 1000))
-    queue.append([millis])
-    if len(queue) > 10:
+    filter_with_time(packet, millis)
+
+queue = []
+def filter_with_time(packet, time):
+    global queue
+    queue.append([time])
+
+    if len(queue) > 9:
         queue.pop(0)
     if len(queue) > 1:
+
+
         means = 0
         # Interval with previous packet in 1 and means
         for i in range(1, len(queue)):
@@ -77,34 +84,36 @@ def filter(packet):
             square_sum += queue[i][3]
         # Standard deviation
         queue[len(queue)-1].append( math.sqrt( abs(square_sum) / (len(queue)-1) ) )
-    data = packet.get_payload()
+    data = ""
+    if use_file:
+        data = packet.load
+    else:
+        data = packet.get_payload()
     pkt = IP(data)
     if len(queue) > 1:
         info = "packet : [src.ip: " + str(pkt.src) + ", dst.ip: " + str(pkt.dst) + " ]" + " ssd= " + str(queue[len(queue)-1][4])
     else:
         info = "packet : [src.ip: " + str(pkt.src) + ", dst.ip: " + str(pkt.dst) + " ]"
     print(info)
-    packet.accept()
-    # if random.choice([True, False]):
-    #     print(info + " Dropped")
-    #     packet.drop()
-    # else:
-    #     print(info + " Forwarded")
-    #     packet.accept()
 
+    if not use_file:
+        packet.accept()
 
+use_file = False
 def main(argv):
     interface1_name = 'enp1s0'
     interface2_name = 'enp5s0'
     listening_port = 80
     local_ip = 0
     iptables_queue = 0
+    global use_file
+    pcap_file_path = ""
 
     try:
         if argv[0] != "sudo":
-            opts, args = getopt.getopt(argv[1:], "hi:j:p:q:", ["help", "interface1=", "interface2=", "port=", "queue="])
+            opts, args = getopt.getopt(argv[1:], "f:hi:j:p:q:", ["file", "help", "interface1=", "interface2=", "port=", "queue="])
         else:
-            opts, args = getopt.getopt(argv[2:], "hi:j:p:q:", ["help", "interface1=", "interface2=", "port=", "queue="])
+            opts, args = getopt.getopt(argv[2:], "f:hi:j:p:q:", ["file", "help", "interface1=", "interface2=", "port=", "queue="])
 
     except getopt.GetoptError:
         usage()
@@ -113,6 +122,10 @@ def main(argv):
         if opt in ("-h", "--help"):
             usage()
             sys.exit()
+        elif opt in ("-f", "--file"):
+            pcap_file_path = arg
+            use_file = True
+            print("Using input file : " + pcap_file_path)
         elif opt in ("-i", "--interface1"):
             interface1_name = arg
             print("Using interface : " + interface1_name)
@@ -127,17 +140,22 @@ def main(argv):
             print("Using queue : " + str(iptables_queue))
 
     # Setting iptables rules
-    set_iptables_rules(iptables_queue, interface1_name, interface2_name)
-
-    nfqueue = NetfilterQueue()
-    nfqueue.bind(iptables_queue, filter)
-    try:
-        nfqueue.run()
-    except KeyboardInterrupt:
-        print('')
-        nfqueue.unbind()
-        # Removing iptables rules
-        remove_iptables_rules()
+    if not use_file:
+        set_iptables_rules(iptables_queue, interface1_name, interface2_name)
+        nfqueue = NetfilterQueue()
+        nfqueue.bind(iptables_queue, filter)
+        try:
+            nfqueue.run()
+        except KeyboardInterrupt:
+            print('')
+            nfqueue.unbind()
+            # Removing iptables rules
+            remove_iptables_rules()
+    else:
+        pcapfile = rdpcap(pcap_file_path)
+        for packet in pcapfile:
+            time = int(round((packet.time * 1000)))
+            filter_with_time(packet, time)
 
 if __name__ == "__main__":
     main(sys.argv)
