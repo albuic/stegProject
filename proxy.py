@@ -1,10 +1,5 @@
 #!/usr/bin/python3
 
-"""
-    Use scapy to modify packets going through your machine.
-    Based on NetfilterQueue to block packets in the kernel and pass them to scapy for validation
-"""
-
 import getopt
 import sys
 from netfilterqueue import NetfilterQueue
