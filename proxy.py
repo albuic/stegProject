@@ -6,6 +6,7 @@ from scapy.all import *
 from statistics import *
 from pathlib import Path
 import os
+import traceback
 
 
 def usage():
@@ -35,7 +36,7 @@ def filter(packet):
     queue.append(packet)
 
     try:
-        pkt = IP(packet.load)
+        #pkt = IP(packet.load)
 
         if len(queue) > ( window_size * window_number ):
             queue.pop(0)
@@ -51,14 +52,15 @@ def filter(packet):
                     pairwises.append(   abs(sigmas[j]-sigmas[i]) / sigmas[i]   )
             regularity = stdev(pairwises)
 
-            info = "last packet : [src.ip: " + '%15s' % str(pkt.src) + ", dst.ip: " + '%15s' % str(pkt.dst) + " ]" + " ssd= " + str(regularity)
+            info = "last packet : [src.ip: " + '%15s' % str(packet[IP].src) + ", dst.ip: " + '%15s' % str(packet[IP].dst) + " ]" + " ssd= " + str(regularity)
         else:
-            info = "last packet : [src.ip: " + '%15s' % str(pkt.src) + ", dst.ip: " + '%15s' % str(pkt.dst) + " ]"
+            info = "last packet : [src.ip: " + '%15s' % str(packet[IP].src) + ", dst.ip: " + '%15s' % str(packet[IP].dst) + " ]"
         print(info)
 
     except Exception:
         queue.pop(len(queue)-1)
-        print("packet dropped")
+        print("packet dropped :\n" + traceback.format_exc())
+        packet
         return
 
 
