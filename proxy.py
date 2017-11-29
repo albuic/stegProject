@@ -111,14 +111,28 @@ def main(argv):
             listening_port = int(arg)
         elif opt in ("-n", "--window-number"):
             window_number = int(arg)
+                if window_number < 2:
+                    raise ValueError()
+            except ValueError:
+                print("ERROR: Window number must be an integer > 1. (Set to '" + window_number + "')")
+                sys.exit(2)
             print("Using " + str(window_number) + " windows")
         elif opt in ("-s", "--window-size"):
-            window_size = int(arg)
+            try:
+                window_size = int(arg)
+                if window_size < 2:
+                    raise ValueError()
+            except ValueError:
+                print("ERROR: Window size must be an integer > 1. (Set to '" + window_size + "')")
+                sys.exit(2)
             print("Using window with " + str(window_size) + " packets")
 
-    # Setting iptables rules
     if pcap_file_path == "":
-        sniff(store=0, prn=filter, iface=interface_name)
+        try:
+            sniff(store=0, prn=filter, iface=interface_name)
+        except OSError:
+            print("ERROR: Interface '" + interface_name + "' does not exist are access denied (are you an admin ?)")
+            sys.exit(2)
     else:
         sniff(store=0, prn=filter, offline=pcap_file_path)
 
