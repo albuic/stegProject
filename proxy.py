@@ -114,7 +114,7 @@ def main(argv):
             print("Using " + str(window_number) + " windows")
         elif opt in ("-s", "--window-size"):
             window_size = int(arg)
-            print("Using window with " + str(window_number) + " packets")
+            print("Using window with " + str(window_size) + " packets")
 
     # Setting iptables rules
     if pcap_file_path == "":
