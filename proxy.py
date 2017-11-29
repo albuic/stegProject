@@ -110,7 +110,8 @@ def main(argv):
             # TODO : filter by port number
             listening_port = int(arg)
         elif opt in ("-n", "--window-number"):
-            window_number = int(arg)
+            try:
+                window_number = int(arg)
                 if window_number < 2:
                     raise ValueError()
             except ValueError:
