@@ -7,6 +7,7 @@ from statistics import *
 from pathlib import Path
 import os
 import traceback
+import time
 
 
 def usage():
@@ -30,22 +31,27 @@ def sublists(l, n):
     for i in range(0, len(l), n):
         yield l[i:i + n]
 
-queue = []
+packet_queue = []
+timestamp_queue = []
 def filter(packet):
-    global queue
-    queue.append(packet)
+    global packet_queue
+    packet_queue.append(packet)
+    if pcap_file_path == "":
+        timestamp_queue.append(int(round(time.time() * 1000)))
+    else:
+        timestamp_queue.append(int(round(packet.time * 1000)))
 
     try:
-        #pkt = IP(packet.load)
+        if len(packet_queue) > ( window_size * window_number ):
+            packet_queue.pop(0)
+            timestamp_queue.pop(0)
 
-        if len(queue) > ( window_size * window_number ):
-            queue.pop(0)
-
-        if len(queue) > ( (window_size * window_number) - 1 ):
-            sub_queues = list(sublists(queue, window_size))
+        if len(packet_queue) > ( (window_size * window_number) - 1 ):
+            sub_packet_queues = list(sublists(packet_queue, window_size))
+            sub_timestamp_queues = list(sublists(timestamp_queue, window_size))
             sigmas = []
-            for sq in sub_queues:
-                sigmas.append(stdev( list(map(lambda p : p.time, sq)) ))
+            for stq in sub_timestamp_queues:
+                sigmas.append(stdev(stq))
             pairwises = []
             for j in range(1, len(sigmas)):
                 for i in range(0, j):
@@ -58,7 +64,8 @@ def filter(packet):
         print(info)
 
     except Exception:
-        queue.pop(len(queue)-1)
+        packet_queue.pop(len(packet_queue)-1)
+        timestamp_queue.pop(len(timestamp_queue)-1)
         print("packet dropped :\n" + traceback.format_exc())
         packet
         return
@@ -66,12 +73,13 @@ def filter(packet):
 
 window_number = 3
 window_size = 10
+pcap_file_path = ""
 def main(argv):
     interface_name = 'enp1s0'
     listening_port = 80
     local_ip = 0
     iptables_queue = 0
-    pcap_file_path = ""
+    global pcap_file_path
     global window_size
     global window_number
 
