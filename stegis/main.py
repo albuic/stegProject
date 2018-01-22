@@ -8,6 +8,7 @@ import traceback
 import time
 
 from utils import *
+from Arguments import *
 
 
 packet_queue = []
@@ -17,7 +18,7 @@ def filter(packet):
     global timestamp_queue
 
     packet_queue.append(packet)
-    if pcap_file_path == "":
+    if self.offline == "":
         timestamp_queue.append(int(round(time.time() * 1000)))
     else:
         timestamp_queue.append(int(round(packet.time * 1000)))
@@ -53,23 +54,15 @@ def filter(packet):
 
 
 
-### DEFAULT ARGUMENTS ###
-window_number = 3
-window_size = 10
-pcap_file_path = ""
-interface_name = 'enp1s0'
-listening_port = 80
-
-
 if __name__ == "__main__":
-    test_arguments(sys.argv)
+    my_arguments = Arguments()
 
-    if pcap_file_path == "":
+    if my_arguments.pcap_file_path == "":
         try:
-            print("Using interface : " + interface_name)
-            sniff(store=0, prn=filter, iface=interface_name)
+            print("Using interface : " + my_arguments.interface_name)
+            sniff(store=0, prn=filter, iface=my_arguments.interface_name)
         except OSError:
-            print("ERROR: Interface '" + interface_name + "' does not exist or access is denied (are you an admin ?)")
+            print("ERROR: Interface '" + my_arguments.interface_name + "' does not exist or access is denied (are you an admin ?)")
             sys.exit(2)
     else:
         sniff(store=0, prn=filter, offline=pcap_file_path)
