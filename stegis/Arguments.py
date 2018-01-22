@@ -65,6 +65,7 @@ class Arguments:
                     sys.exit(2)
                 print("Using window with " + str(self.window_size) + " packets")
 
+    @staticmethod
     def help():
         print("options :                                                                                                                  \n"
               "    '-f <pcap file>' or '--file=<pcap file>'                         Using pcap file as input                              \n"
