@@ -87,11 +87,11 @@ class Sender:
                     print("Sending bit '" + str(bit_to_send) + "' in IP Packet Identification field")
                 else:
                     if self.__next_bit == 1:
-                        print("Sending: " + str(bit_to_send), end='')
+                        print("Sending: " + str(bit_to_send), end='', flush=True)
                     elif self.__next_bit == 0:
                         print(str(bit_to_send))
                     else:
-                        print(str(bit_to_send), end='')
+                        print(str(bit_to_send), end='', flush=True)
             if self.__ip_do_not_fragment_field:
                 # TODO
                 pass
