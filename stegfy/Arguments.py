@@ -62,6 +62,7 @@ class Arguments:
                 self.sender = True
             elif opt in ("--input-string"):
                 self.input_string = arg
+                self.sender = True
             elif opt in ("-q", "--queue-number"):
                 try:
                     self.queue_number = int(arg)

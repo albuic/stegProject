@@ -80,7 +80,7 @@ class Sender:
                 pass
             if self.__ip_packet_identification_field:
                 bit_to_send = self.get_next_bit()
-                pkt.IP.identification = bit_to_send
+                pkt.id = bit_to_send
                 print("Sending bit '" + bit_to_send + "' in IP Packet Identification field")
             if self.__ip_do_not_fragment_field:
                 # TODO

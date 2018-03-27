@@ -69,8 +69,8 @@ class Receiver:
                 # TODO
                 pass
             if self.__ip_packet_identification_field:
-                bit_to_send = self.add_next_bit(pkt.IP.identification)
-                print("Receiving bit '" + pkt.IP.identification + "' in IP Packet Identification field")
+                bit_to_send = self.add_next_bit(pkt.id)
+                print("Receiving bit '" + pkt.id + "' in IP Packet Identification field")
             if self.__tcp_initial_sequence_number_field:
                 # TODO: test if tcp packet
                 pass
