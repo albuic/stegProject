@@ -94,18 +94,18 @@ class Sender:
 
                             char_mask = ''
                             if bit_to_send == 0:
-                                for i in xrange(0, index):
+                                for i in range(0, index):
                                     char_mask += '1'
                                 char_mask += '0'
-                                for i in xrange(index+1, 16):
+                                for i in range(index+1, 16):
                                     char_mask += '1'
                                 int_mask = int(char_mask, 2)
                                 pkt.id = bit_to_send & int_mask
                             elif bit_to_send == 1:
-                                for i in xrange(0, index):
+                                for i in range(0, index):
                                     char_mask += '0'
                                 char_mask += '1'
-                                for i in xrange(index+1, 16):
+                                for i in range(index+1, 16):
                                     char_mask += '0'
                                 int_mask = int(char_mask, 2)
                                 pkt.id = bit_to_send | int_mask
