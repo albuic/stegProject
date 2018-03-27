@@ -89,8 +89,7 @@ class Sender:
                 if self.__ip_packet_identification_field:
                     for index, my_char in enumerate(self.__ip_packet_identification_field_mask):
                         if my_char == "1":
-                            character_used = self.__actual_byte
-                            bit_to_send = self.get_next_bit()
+                            bit_to_send = self.get_next_bit("IP Packet Identification field")
 
                             char_mask = ''
                             if bit_to_send == 0:
@@ -110,16 +109,6 @@ class Sender:
                                 int_mask = int(char_mask, 2)
                                 pkt.id = bit_to_send | int_mask
 
-                            if self.__verbose:
-                                print("Sending bit '" + str(bit_to_send) + "' in IP Packet Identification field")
-                            else:
-                                if self.__next_bit == 1:
-                                    print("Sending: " + str(bit_to_send), end='', flush=True)
-                                elif self.__next_bit == 0:
-                                    print(str(bit_to_send) + "      ('" + character_used + "')")
-                                else:
-                                    print(str(bit_to_send), end='', flush=True)
-                                sys.stdout.flush()
                 if self.__ip_do_not_fragment_field:
                     # TODO
                     pass
@@ -132,10 +121,23 @@ class Sender:
         packet.accept()
 
 
-    def get_next_bit(self):
-        bit = ''
-
+    def get_next_bit(self, where):
         bit = self.__actual_bits[self.__next_bit]
+
+        if self.__verbose:
+            print("Sending bit '" + str(bit) + "' in " + where)
+            if self.__next_bit == 7:
+                print("New character sended : '" + str(self.__actual_byte) + "'")
+        else:
+            if self.__next_bit == 0:
+                print("Sending: " + str(bit), end='', flush=True)
+            elif self.__next_bit == 7:
+                print(str(bit) + "      ('" + self.__actual_byte + "')")
+            else:
+                print(str(bit), end='', flush=True)
+            sys.stdout.flush()
+
+
         self.__next_bit += 1
         if self.__next_bit == 8:
             self.__next_bit = 0
