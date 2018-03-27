@@ -81,7 +81,7 @@ class Sender:
             if self.__ip_packet_identification_field:
                 bit_to_send = self.get_next_bit()
                 pkt.id = bit_to_send
-                print("Sending bit '" + bit_to_send + "' in IP Packet Identification field")
+                print("Sending bit '" + str(bit_to_send) + "' in IP Packet Identification field")
             if self.__ip_do_not_fragment_field:
                 # TODO
                 pass
@@ -95,7 +95,6 @@ class Sender:
 
     def get_next_bit(self):
         bit = ''
-        bits = ''
 
         bit = self.__actual_bits[self.__next_bit]
         self.__next_bit += 1
@@ -108,7 +107,7 @@ class Sender:
                     print("File has been sent.\nNow sending everything without any encoding.")
             else:
                 self.__next_byte += 1
-                if len(self.__input_string) > self.__next_byte:
+                if len(self.__input_string) < self.__next_byte + 1:
                     print("String has been sent.\nNow sending everything without any encoding.")
                 else:
                     self.__actual_byte = self.__input_string[self.__next_byte]
