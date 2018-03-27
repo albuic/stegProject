@@ -52,8 +52,6 @@ class Sender:
             self.__actual_byte = self.__input_string[0]
 
         self.__actual_bits = bin(ord(self.__actual_byte))[2:].zfill(8)
-        print(bin(ord(self.__actual_byte))[2:])
-        print(bin(ord(self.__actual_byte))[2:].zfill(8))
 
         self.handle_packet()
 
