@@ -6,6 +6,7 @@ from pathlib import Path
 
 
 class Arguments:
+    verbose = False
     receiver = False
     sender = False
     input_file = None
@@ -35,9 +36,9 @@ class Arguments:
     def get_arguments(self, argv):
         try:
             if argv[0] != "sudo":
-                opts, args = getopt.getopt(argv[1:], "hi:o:q:rst:w:x:y:z:1234", ["help", "receiver", "sender", "input-file=", "output-file=", "queue-number=", "one-lower-limit=", "one-upper-limit=", "input-string=", "treshold=", "time-shifter", "fields-shifter", "zero-lower-limit=", "zero-upper-limit=", "tcp-acknowledge-sequence-number-field", "tcp-initial-sequence-number-field", "ip-packet-identification-field", "ip-do-not-fragment-field"])
+                opts, args = getopt.getopt(argv[1:], "hi:o:q:rst:vw:x:y:z:1234", ["help", "verbose", "receiver", "sender", "input-file=", "output-file=", "queue-number=", "one-lower-limit=", "one-upper-limit=", "input-string=", "treshold=", "time-shifter", "fields-shifter", "zero-lower-limit=", "zero-upper-limit=", "tcp-acknowledge-sequence-number-field", "tcp-initial-sequence-number-field", "ip-packet-identification-field", "ip-do-not-fragment-field"])
             else:
-                opts, args = getopt.getopt(argv[2:], "hi:o:q:rst:w:x:y:z:1234", ["help", "receiver", "sender", "input-file=", "output-file=", "queue-number=", "one-lower-limit=", "one-upper-limit=", "input-string=", "treshold=", "time-shifter", "fields-shifter", "zero-lower-limit=", "zero-upper-limit=", "tcp-acknowledge-sequence-number-field", "tcp-initial-sequence-number-field", "ip-packet-identification-field", "ip-do-not-fragment-field"])
+                opts, args = getopt.getopt(argv[2:], "hi:o:q:rst:vw:x:y:z:1234", ["help", "verbose", "receiver", "sender", "input-file=", "output-file=", "queue-number=", "one-lower-limit=", "one-upper-limit=", "input-string=", "treshold=", "time-shifter", "fields-shifter", "zero-lower-limit=", "zero-upper-limit=", "tcp-acknowledge-sequence-number-field", "tcp-initial-sequence-number-field", "ip-packet-identification-field", "ip-do-not-fragment-field"])
         except getopt.GetoptError as err:
             print(err)
             Arguments.help()
@@ -47,6 +48,8 @@ class Arguments:
             if opt in ("-h", "--help"):
                 Arguments.help()
                 sys.exit()
+            elif opt in ("-v", "--verbose"):
+                self.verbose = True
             elif opt in ("-i", "--input-file"):
                 self.input_file = arg
                 if not Path(self.input_file).is_file():
@@ -211,6 +214,7 @@ class Arguments:
               "                                                                                                                    \n"
               "Options :                                                                                                           \n"
               "    '-h' or '--help'                                      Show this help and exit                                   \n"
+              "    '-v' or '--verbose'                                   Activate verbose mode  (Show debug info)                  \n"
               "    '-r' or '--receiver'                                  Start program in receiver mode                            \n"
               "                                                            Default : Receiver mode                                 \n"
               "    '-s' or '--sender'                                    Start program in sender mode                              \n"

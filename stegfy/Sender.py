@@ -3,6 +3,7 @@ from scapy.all import *
 
 
 class Sender:
+    __verbose = False
     __input_file = None
     __input_string = None
     __queue_number = 10
@@ -25,7 +26,8 @@ class Sender:
     __actual_bits = None
 
 
-    def __init__(self, input_file, input_string, queue_number, time_shifter, fields_shifter, treshold, one_lower_limit, one_upper_limit, zero_lower_limit, zero_upper_limit, tcp_acknowledge_sequence_number_field, tcp_initial_sequence_number_field, ip_packet_identification_field, ip_do_not_fragment_field):
+    def __init__(self, verbose, input_file, input_string, queue_number, time_shifter, fields_shifter, treshold, one_lower_limit, one_upper_limit, zero_lower_limit, zero_upper_limit, tcp_acknowledge_sequence_number_field, tcp_initial_sequence_number_field, ip_packet_identification_field, ip_do_not_fragment_field):
+        self.__verbose = verbose
         self.__input_file = input_file
         self.__input_string = input_string
         self.__queue_number = queue_number
@@ -81,7 +83,15 @@ class Sender:
             if self.__ip_packet_identification_field:
                 bit_to_send = self.get_next_bit()
                 pkt.id = bit_to_send
-                print("Sending bit '" + str(bit_to_send) + "' in IP Packet Identification field")
+                if self.__verbose:
+                    print("Sending bit '" + str(bit_to_send) + "' in IP Packet Identification field")
+                else:
+                    if self.__next_bit == 1:
+                        print("Sending: " + str(bit_to_send), end='')
+                    elif self.__next_bit == 0:
+                        print(str(bit_to_send))
+                    else:
+                        print(str(bit_to_send), end='')
             if self.__ip_do_not_fragment_field:
                 # TODO
                 pass

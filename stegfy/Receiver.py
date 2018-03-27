@@ -3,6 +3,7 @@ from scapy.all import *
 
 
 class Receiver:
+    __verbose = False
     __output_file = None
     __queue_number = 10
     __time_shifter = False
@@ -22,7 +23,8 @@ class Receiver:
     __actual_byte = 0
 
 
-    def __init__(self, output_file, queue_number, time_shifter, fields_shifter, treshold, one_lower_limit, one_upper_limit, zero_lower_limit, zero_upper_limit, tcp_acknowledge_sequence_number_field, tcp_initial_sequence_number_field, ip_packet_identification_field, ip_do_not_fragment_field):
+    def __init__(self, verbose, output_file, queue_number, time_shifter, fields_shifter, treshold, one_lower_limit, one_upper_limit, zero_lower_limit, zero_upper_limit, tcp_acknowledge_sequence_number_field, tcp_initial_sequence_number_field, ip_packet_identification_field, ip_do_not_fragment_field):
+        self.__verbose = verbose
         self.__output_file = output_file
         self.__queue_number = queue_number
         self.__time_shifter = time_shifter
