@@ -92,6 +92,7 @@ class Sender:
                         print(str(bit_to_send))
                     else:
                         print(str(bit_to_send), end='', flush=True)
+                    sys.stdout.flush()
             if self.__ip_do_not_fragment_field:
                 # TODO
                 pass
