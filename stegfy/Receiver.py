@@ -19,7 +19,7 @@ class Receiver:
 
     __my_file = None
     __next_bit = 0
-    __actual_byte = ''
+    __actual_byte = 0
 
 
     def __init__(self, output_file, queue_number, time_shifter, fields_shifter, treshold, one_lower_limit, one_upper_limit, zero_lower_limit, zero_upper_limit, tcp_acknowledge_sequence_number_field, tcp_initial_sequence_number_field, ip_packet_identification_field, ip_do_not_fragment_field):
@@ -70,7 +70,7 @@ class Receiver:
                 pass
             if self.__ip_packet_identification_field:
                 bit_to_send = self.add_next_bit(pkt.id)
-                print("Receiving bit '" + pkt.id + "' in IP Packet Identification field")
+                print("Receiving bit '" + str(pkt.id) + "' in IP Packet Identification field")
             if self.__tcp_initial_sequence_number_field:
                 # TODO: test if tcp packet
                 pass

@@ -51,7 +51,9 @@ class Sender:
         else:
             self.__actual_byte = self.__input_string[0]
 
-        self.__actual_bits = bin(ord(self.__actual_byte)).zfill(8)
+        self.__actual_bits = bin(ord(self.__actual_byte))[2:].zfill(8)
+        print(bin(ord(self.__actual_byte))[2:])
+        print(bin(ord(self.__actual_byte))[2:].zfill(8))
 
         self.handle_packet()
 
@@ -85,7 +87,7 @@ class Sender:
             if self.__ip_do_not_fragment_field:
                 # TODO
                 pass
-            packet.set_payload(bytes(pkt))
+            packet.set_payload(bytes(pkt)) #TODO: bugging here ????
 
         if self.__time_shifter:
             #TODO
@@ -111,6 +113,6 @@ class Sender:
                     print("String has been sent.\nNow sending everything without any encoding.")
                 else:
                     self.__actual_byte = self.__input_string[self.__next_byte]
-            self.__actual_bits = bin(ord(self.__actual_byte)).zfill(8)
+            self.__actual_bits = bin(ord(self.__actual_byte))[2:].zfill(8)
 
-        return 0 if bit == b'0' else 1
+        return 0 if bit == '0' else 1
