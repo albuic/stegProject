@@ -77,7 +77,7 @@ class Receiver:
             if self.__tcp_acknowledge_sequence_number_field:
                 # TODO: test if tcp packet
                 pass
-            packet.set_payload(raw(pkt))
+            packet.set_payload(bytes(pkt))
 
         packet.accept()
 

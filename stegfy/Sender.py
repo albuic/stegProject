@@ -85,7 +85,7 @@ class Sender:
             if self.__ip_do_not_fragment_field:
                 # TODO
                 pass
-            packet.set_payload(raw(pkt))
+            packet.set_payload(bytes(pkt))
 
         if self.__time_shifter:
             #TODO
@@ -114,4 +114,4 @@ class Sender:
                     self.__actual_byte = self.__input_string[self.__next_byte]
             self.__actual_bits = bin(ord(self.__actual_byte)).zfill(8)
 
-        return bit
+        return 0 if bit == b'0' else 1
