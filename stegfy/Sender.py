@@ -102,7 +102,7 @@ class Sender:
                 if self.__ip_do_not_fragment_field:
                     # TODO
                     pass
-                packet.set_payload(bytes(pkt)) #TODO: bugging here ????
+                packet.set_payload(bytes(pkt))
 
             if self.__time_shifter:
                 #TODO
