@@ -69,40 +69,47 @@ class Sender:
         nfqueue.unbind()
 
     def handler(self, packet):
-        payload = packet.get_payload()
-        pkt = IP(payload)
+        if (self.__input_file != None) and (self.__actual_byte == ""):
+            print("File has been sent.\nNow sending everything without any encoding.")
+        elif (self.__input_string != None) and (len(self.__input_string) < self.__next_byte + 1):
+            print("String has been sent.\nNow sending everything without any encoding.")
+        else:
+            payload = packet.get_payload()
+            pkt = IP(payload)
 
-        # TODO: test if packet is an IP packet and can be used
-        if self.__fields_shifter:
-            if self.__tcp_acknowledge_sequence_number_field:
-                # TODO: test if tcp packet
-                pass
-            if self.__tcp_initial_sequence_number_field:
-                # TODO: test if tcp packet
-                pass
-            if self.__ip_packet_identification_field:
-                bit_to_send = self.get_next_bit()
-                pkt.id = bit_to_send
-                if self.__verbose:
-                    print("Sending bit '" + str(bit_to_send) + "' in IP Packet Identification field")
-                else:
-                    if self.__next_bit == 1:
-                        print("Sending: " + str(bit_to_send), end='', flush=True)
-                    elif self.__next_bit == 0:
-                        print(str(bit_to_send))
+            # TODO: test if packet is an IP packet and can be used
+            if self.__fields_shifter:
+                if self.__tcp_acknowledge_sequence_number_field:
+                    # TODO: test if tcp packet
+                    pass
+                if self.__tcp_initial_sequence_number_field:
+                    # TODO: test if tcp packet
+                    pass
+                if self.__ip_packet_identification_field:
+                    character_used = self.__actual_byte
+                    bit_to_send = self.get_next_bit()
+                    pkt.id = bit_to_send
+                    if self.__verbose:
+                        print("Sending bit '" + str(bit_to_send) + "' in IP Packet Identification field")
                     else:
-                        print(str(bit_to_send), end='', flush=True)
-                    sys.stdout.flush()
-            if self.__ip_do_not_fragment_field:
-                # TODO
-                pass
-            packet.set_payload(bytes(pkt)) #TODO: bugging here ????
+                        if self.__next_bit == 1:
+                            print("Sending: " + str(bit_to_send), end='', flush=True)
+                        elif self.__next_bit == 0:
+                            print(str(bit_to_send) + "      ('" + character_used + "')")
+                        else:
+                            print(str(bit_to_send), end='', flush=True)
+                        sys.stdout.flush()
+                if self.__ip_do_not_fragment_field:
+                    # TODO
+                    pass
+                packet.set_payload(bytes(pkt)) #TODO: bugging here ????
 
-        if self.__time_shifter:
-            #TODO
-            print("TODO: timeshifter")
+            if self.__time_shifter:
+                #TODO
+                print("TODO: timeshifter")
 
         packet.accept()
+
 
     def get_next_bit(self):
         bit = ''
@@ -111,16 +118,13 @@ class Sender:
         self.__next_bit += 1
         if self.__next_bit == 8:
             self.__next_bit = 0
-            if self.__input_file:
+            if self.__input_file != None:
                 self.__actual_byte = self.__my_file.read(1)
                 if self.__actual_byte == "":
                     self.__my_file.close()
-                    print("File has been sent.\nNow sending everything without any encoding.")
             else:
                 self.__next_byte += 1
-                if len(self.__input_string) < self.__next_byte + 1:
-                    print("String has been sent.\nNow sending everything without any encoding.")
-                else:
+                if len(self.__input_string) > self.__next_byte:
                     self.__actual_byte = self.__input_string[self.__next_byte]
             self.__actual_bits = bin(ord(self.__actual_byte))[2:].zfill(8)
 
