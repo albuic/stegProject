@@ -18,7 +18,7 @@ class Sender:
     __tcp_initial_sequence_number_field = False
     __ip_packet_identification_field = False
     __ip_do_not_fragment_field = False
-
+    __ip_packet_identification_field_mask = "1000000000000000"
     __my_file = None
     __next_bit = 0
     __next_byte = 0
@@ -26,7 +26,7 @@ class Sender:
     __actual_bits = None
 
 
-    def __init__(self, verbose, input_file, input_string, queue_number, time_shifter, fields_shifter, treshold, one_lower_limit, one_upper_limit, zero_lower_limit, zero_upper_limit, tcp_acknowledge_sequence_number_field, tcp_initial_sequence_number_field, ip_packet_identification_field, ip_do_not_fragment_field):
+    def __init__(self, verbose, input_file, input_string, queue_number, time_shifter, fields_shifter, treshold, one_lower_limit, one_upper_limit, zero_lower_limit, zero_upper_limit, tcp_acknowledge_sequence_number_field, tcp_initial_sequence_number_field, ip_packet_identification_field, ip_do_not_fragment_field, ip_packet_identification_field_mask):
         self.__verbose = verbose
         self.__input_file = input_file
         self.__input_string = input_string
@@ -42,6 +42,7 @@ class Sender:
         self.__tcp_initial_sequence_number_field = tcp_initial_sequence_number_field
         self.__ip_packet_identification_field = ip_packet_identification_field
         self.__ip_do_not_fragment_field = ip_do_not_fragment_field
+        self.__ip_packet_identification_field_mask = ip_packet_identification_field_mask
 
         if self.__input_file:
             self.__my_file = open(self.__input_file, 'r')
@@ -86,19 +87,39 @@ class Sender:
                     # TODO: test if tcp packet
                     pass
                 if self.__ip_packet_identification_field:
-                    character_used = self.__actual_byte
-                    bit_to_send = self.get_next_bit()
-                    pkt.id = bit_to_send
-                    if self.__verbose:
-                        print("Sending bit '" + str(bit_to_send) + "' in IP Packet Identification field")
-                    else:
-                        if self.__next_bit == 1:
-                            print("Sending: " + str(bit_to_send), end='', flush=True)
-                        elif self.__next_bit == 0:
-                            print(str(bit_to_send) + "      ('" + character_used + "')")
-                        else:
-                            print(str(bit_to_send), end='', flush=True)
-                        sys.stdout.flush()
+                    for index, my_char in enumerate(self.__ip_packet_identification_field_mask):
+                        if my_char == "1":
+                            character_used = self.__actual_byte
+                            bit_to_send = self.get_next_bit()
+
+                            char_mask = ''
+                            if bit_to_send == 0:
+                                for i in xrange(0, index):
+                                    char_mask += '1'
+                                char_mask += '0'
+                                for i in xrange(index+1, 16):
+                                    char_mask += '1'
+                                int_mask = int(char_mask, 2)
+                                pkt.id = bit_to_send & int_mask
+                            elif bit_to_send == 1:
+                                for i in xrange(0, index):
+                                    char_mask += '0'
+                                char_mask += '1'
+                                for i in xrange(index+1, 16):
+                                    char_mask += '0'
+                                int_mask = int(char_mask, 2)
+                                pkt.id = bit_to_send | int_mask
+
+                            if self.__verbose:
+                                print("Sending bit '" + str(bit_to_send) + "' in IP Packet Identification field")
+                            else:
+                                if self.__next_bit == 1:
+                                    print("Sending: " + str(bit_to_send), end='', flush=True)
+                                elif self.__next_bit == 0:
+                                    print(str(bit_to_send) + "      ('" + character_used + "')")
+                                else:
+                                    print(str(bit_to_send), end='', flush=True)
+                                sys.stdout.flush()
                 if self.__ip_do_not_fragment_field:
                     # TODO
                     pass
