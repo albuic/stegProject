@@ -70,11 +70,7 @@ class Sender:
         nfqueue.unbind()
 
     def handler(self, packet):
-        if (self.__input_file != None) and (self.__actual_byte == ""):
-            print("File has been sent.\nNow sending everything without any encoding.")
-        elif (self.__input_string != None) and (len(self.__input_string) < self.__next_byte + 1):
-            print("String has been sent.\nNow sending everything without any encoding.")
-        else:
+        if not ( (self.__input_file != None) and (self.__actual_byte == "") ) and not ( (self.__input_string != None) and (len(self.__input_string) < self.__next_byte + 1) ):
             payload = packet.get_payload()
             pkt = IP(payload)
 
@@ -90,6 +86,9 @@ class Sender:
                     for index, my_char in enumerate(self.__ip_packet_identification_field_mask):
                         if my_char == "1":
                             bit_to_send = self.get_next_bit("IP Packet Identification field")
+
+                            if self.__verbose:
+                                print(pkt.show())
 
                             char_mask = ''
                             if bit_to_send == 0:
@@ -150,5 +149,11 @@ class Sender:
                 if len(self.__input_string) > self.__next_byte:
                     self.__actual_byte = self.__input_string[self.__next_byte]
             self.__actual_bits = bin(ord(self.__actual_byte))[2:].zfill(8)
+
+            if (self.__input_file != None) and (self.__actual_byte == ""):
+                print("File has been sent.\nNow sending everything without any encoding.")
+            elif (self.__input_string != None) and (len(self.__input_string) < self.__next_byte + 1):
+                print("String has been sent.\nNow sending everything without any encoding.")
+
 
         return 0 if bit == '0' else 1
