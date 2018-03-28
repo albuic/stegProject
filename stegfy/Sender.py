@@ -112,6 +112,9 @@ class Sender:
                                 int_mask = int(char_mask, 2)
                                 pkt.id = pkt.id | int_mask
 
+                            del pkt.chksum
+                            pkt = pkt.__class__(str(pkt))
+
                             if self.__verbose > 1:
                                 print("packet.id after :  " + str(pkt.id))
                             if self.__verbose > 4:
