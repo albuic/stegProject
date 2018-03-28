@@ -97,8 +97,8 @@ class Receiver:
             self.__actual_byte = self.__actual_byte | 0b00000001
 
         if self.__verbose > 1:
-            print("byte content after : " + str(bin(self.__actual_byte)))
             print("Receiving bit '" + new_bit + "' in " + where)
+            print("byte content after : " + str(bin(self.__actual_byte)))
             if self.__next_bit == 7:
                 print("New character received : '" + str(self.__actual_byte) + "'")
         else:
