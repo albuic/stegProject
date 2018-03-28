@@ -113,5 +113,6 @@ class Receiver:
         self.__next_bit += 1
         if self.__next_bit == 8:
             self.__next_bit = 0
+            self.__actual_byte = 0
             if self.__output_file != None:
                 self.__my_file(str(self.__actual_byte))
