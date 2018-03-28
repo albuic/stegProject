@@ -90,7 +90,7 @@ class Receiver:
         if self.__verbose > 1:
             print("byte content before : " + str(bin(self.__actual_byte)))
 
-        self.__actual_byte << 1
+        self.__actual_byte = self.__actual_byte << 1
         if new_bit == 0:
             self.__actual_byte = self.__actual_byte & 0b11111110
         else:
