@@ -88,7 +88,7 @@ class Sender:
                             bit_to_send = self.get_next_bit("IP Packet Identification field")
 
                             if self.__verbose:
-                                print(pkt.show())
+                                print("Before : **********\n" + pkt.show() + "**********************")
 
                             char_mask = ''
                             if bit_to_send == 0:
@@ -109,7 +109,7 @@ class Sender:
                                 pkt.id = bit_to_send | int_mask
 
                             if self.__verbose:
-                                print(pkt.show())
+                                print("After : **********\n" + pkt.show() + "**********************")
 
                 if self.__ip_do_not_fragment_field:
                     # TODO
