@@ -91,7 +91,7 @@ class Receiver:
             print("byte content before : " + str(bin(self.__actual_byte)))
 
         self.__actual_byte = self.__actual_byte << 1
-        if new_bit == 0:
+        if new_bit == '0':
             self.__actual_byte = self.__actual_byte & 0b11111110
         else:
             self.__actual_byte = self.__actual_byte | 0b00000001
