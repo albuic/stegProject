@@ -108,6 +108,9 @@ class Sender:
                                 int_mask = int(char_mask, 2)
                                 pkt.id = bit_to_send | int_mask
 
+                            if self.__verbose:
+                                print(pkt.show())
+
                 if self.__ip_do_not_fragment_field:
                     # TODO
                     pass
