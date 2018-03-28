@@ -73,7 +73,7 @@ class Receiver:
             if self.__ip_packet_identification_field:
                 for index, my_char in enumerate(self.__ip_packet_identification_field_mask):
                     if my_char == "1":
-                        new_bit = str(pkt.id).zfill(16)[index]
+                        new_bit = bin(pkt.id)[2:].zfill(16)[index]
                         self.add_next_bit(new_bit, "IP Packet Identification field")
             if self.__ip_do_not_fragment_field:
                 # TODO
