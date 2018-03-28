@@ -113,7 +113,7 @@ class Sender:
                                 pkt.id = pkt.id | int_mask
 
                             del pkt.chksum
-                            pkt = pkt.__class__(str(pkt))
+                            pkt = pkt.__class__(bytes(pkt))
 
                             if self.__verbose > 1:
                                 print("packet.id after :  " + str(pkt.id))
