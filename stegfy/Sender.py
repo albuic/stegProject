@@ -100,7 +100,7 @@ class Sender:
                                 for i in range(index+1, 16):
                                     char_mask += '1'
                                 int_mask = int(char_mask, 2)
-                                pkt.id = bit_to_send & int_mask
+                                pkt.id = pkt.id & int_mask
                             elif bit_to_send == 1:
                                 for i in range(0, index):
                                     char_mask += '0'
@@ -108,7 +108,7 @@ class Sender:
                                 for i in range(index+1, 16):
                                     char_mask += '0'
                                 int_mask = int(char_mask, 2)
-                                pkt.id = bit_to_send | int_mask
+                                pkt.id = pkt.id | int_mask
 
                             if self.__verbose:
                                 print("After : **************\n")
