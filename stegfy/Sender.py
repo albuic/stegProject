@@ -88,7 +88,7 @@ class Sender:
                             bit_to_send = self.get_next_bit("IP Packet Identification field")
 
                             if self.__verbose > 1:
-                                print("packet.id before : " + pkt.id)
+                                print("packet.id before : " + str(pkt.id))
                             if self.__verbose > 4:
                                 print("Before : *************\n")
                                 pkt.show()
@@ -113,7 +113,7 @@ class Sender:
                                 pkt.id = pkt.id | int_mask
 
                             if self.__verbose > 1:
-                                print("packet.id after :  " + pkt.id)
+                                print("packet.id after :  " + str(pkt.id))
                             if self.__verbose > 4:
                                 print("After : **************\n")
                                 pkt.show()

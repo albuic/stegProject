@@ -87,6 +87,9 @@ class Receiver:
         packet.accept()
 
     def add_next_bit(self, new_bit, where):
+        if self.__verbose > 1:
+            print("byte content before : " + str(bin(self.__actual_byte)))
+
         self.__actual_byte << 1
         if new_bit == 0:
             self.__actual_byte = self.__actual_byte & 0b11111110
@@ -94,6 +97,7 @@ class Receiver:
             self.__actual_byte = self.__actual_byte | 0b00000001
 
         if self.__verbose > 1:
+            print("byte content after : " + str(bin(self.__actual_byte)))
             print("Receiving bit '" + new_bit + "' in " + where)
             if self.__next_bit == 7:
                 print("New character received : '" + str(self.__actual_byte) + "'")
