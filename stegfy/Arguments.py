@@ -133,7 +133,7 @@ class Arguments:
                     print("ERROR : Mask '" + arg + "' is not a 16 character string representing a mask.")
                     sys.exit(2)
                 for my_char in arg:
-                    if my_char != '0' or my_char != '1':
+                    if my_char != '0' and my_char != '1':
                         print("ERROR : Mask '" + arg + "' contained unkown character.")
                         sys.exit(2)
                 self.ip_packet_identification_field_mask = arg
