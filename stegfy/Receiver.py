@@ -100,12 +100,12 @@ class Receiver:
             print("Receiving bit '" + new_bit + "' in " + where)
             print("byte content after : " + str(bin(self.__actual_byte)))
             if self.__next_bit == 7:
-                print("New character received : '" + str(self.__actual_byte) + "'")
+                print("New character received : '" + chr(self.__actual_byte) + "'")
         else:
             if self.__next_bit == 0:
                 print("Receiving: " + new_bit, end='', flush=True)
             elif self.__next_bit == 7:
-                print(new_bit + "      ('" + str(self.__actual_byte) + "')")
+                print(new_bit + "      ('" + chr(self.__actual_byte) + "')")
             else:
                 print(new_bit, end='', flush=True)
             sys.stdout.flush()
