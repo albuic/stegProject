@@ -6,7 +6,7 @@ from pathlib import Path
 
 
 class Arguments:
-    verbose = False
+    verbose = 0
     receiver = False
     sender = False
     input_file = None
@@ -37,9 +37,9 @@ class Arguments:
     def get_arguments(self, argv):
         try:
             if argv[0] != "sudo":
-                opts, args = getopt.getopt(argv[1:], "hi:o:q:rst:vw:x:y:z:1234m:", ["help", "verbose", "receiver", "sender", "input-file=", "output-file=", "queue-number=", "one-lower-limit=", "one-upper-limit=", "input-string=", "treshold=", "time-shifter", "fields-shifter", "zero-lower-limit=", "zero-upper-limit=", "tcp-acknowledge-sequence-number-field", "tcp-initial-sequence-number-field", "ip-packet-identification-field", "ip-do-not-fragment-field", "mask="])
+                opts, args = getopt.getopt(argv[1:], "hi:o:q:rst:v:w:x:y:z:1234m:", ["help", "verbose=", "receiver", "sender", "input-file=", "output-file=", "queue-number=", "one-lower-limit=", "one-upper-limit=", "input-string=", "treshold=", "time-shifter", "fields-shifter", "zero-lower-limit=", "zero-upper-limit=", "tcp-acknowledge-sequence-number-field", "tcp-initial-sequence-number-field", "ip-packet-identification-field", "ip-do-not-fragment-field", "mask="])
             else:
-                opts, args = getopt.getopt(argv[2:], "hi:o:q:rst:vw:x:y:z:1234m:", ["help", "verbose", "receiver", "sender", "input-file=", "output-file=", "queue-number=", "one-lower-limit=", "one-upper-limit=", "input-string=", "treshold=", "time-shifter", "fields-shifter", "zero-lower-limit=", "zero-upper-limit=", "tcp-acknowledge-sequence-number-field", "tcp-initial-sequence-number-field", "ip-packet-identification-field", "ip-do-not-fragment-field", "mask="])
+                opts, args = getopt.getopt(argv[2:], "hi:o:q:rst:v:w:x:y:z:1234m:", ["help", "verbose=", "receiver", "sender", "input-file=", "output-file=", "queue-number=", "one-lower-limit=", "one-upper-limit=", "input-string=", "treshold=", "time-shifter", "fields-shifter", "zero-lower-limit=", "zero-upper-limit=", "tcp-acknowledge-sequence-number-field", "tcp-initial-sequence-number-field", "ip-packet-identification-field", "ip-do-not-fragment-field", "mask="])
         except getopt.GetoptError as err:
             print(err)
             Arguments.help()
@@ -50,7 +50,11 @@ class Arguments:
                 Arguments.help()
                 sys.exit()
             elif opt in ("-v", "--verbose"):
-                self.verbose = True
+                try:
+                    self.verbose = int(arg)
+                except ValueError:
+                    print("ERROR : Verbose level '" + arg + "' is not an integer.")
+                    sys.exit(2)
             elif opt in ("-i", "--input-file"):
                 self.input_file = arg
                 if not Path(self.input_file).is_file():
@@ -224,8 +228,8 @@ class Arguments:
               "                                                                                                                    \n"
               "Options :                                                                                                           \n"
               "    '-h' or '--help'                                      Show this help and exit                                   \n"
-              "    '-v' or '--verbose'                                   Activate verbose mode  (Show debug info)                  \n"
-              "                                                            Default : Not activated                                 \n"
+              "    '-v' or '--verbose'                                   Set verbose level (Show debug info) from 1 to 5           \n"
+              "                                                            Default : 0                                             \n"
               "    '-r' or '--receiver'                                  Start program in receiver mode                            \n"
               "                                                            Default : Receiver mode                                 \n"
               "    '-s' or '--sender'                                    Start program in sender mode                              \n"

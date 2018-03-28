@@ -3,7 +3,7 @@ from scapy.all import *
 
 
 class Sender:
-    __verbose = False
+    __verbose = 0
     __input_file = None
     __input_string = None
     __queue_number = 10
@@ -87,7 +87,9 @@ class Sender:
                         if my_char == "1":
                             bit_to_send = self.get_next_bit("IP Packet Identification field")
 
-                            if self.__verbose:
+                            if self.__verbose > 1:
+                                print("packet.id before : " + pkt.id)
+                            if self.__verbose > 4:
                                 print("Before : *************\n")
                                 pkt.show()
                                 print("**********************")
@@ -110,7 +112,9 @@ class Sender:
                                 int_mask = int(char_mask, 2)
                                 pkt.id = pkt.id | int_mask
 
-                            if self.__verbose:
+                            if self.__verbose > 1:
+                                print("packet.id after :  " + pkt.id)
+                            if self.__verbose > 4:
                                 print("After : **************\n")
                                 pkt.show()
                                 print("**********************")
@@ -130,7 +134,7 @@ class Sender:
     def get_next_bit(self, where):
         bit = self.__actual_bits[self.__next_bit]
 
-        if self.__verbose:
+        if self.__verbose > 1:
             print("Sending bit '" + str(bit) + "' in " + where)
             if self.__next_bit == 7:
                 print("New character sended : '" + str(self.__actual_byte) + "'")

@@ -3,7 +3,7 @@ from scapy.all import *
 
 
 class Receiver:
-    __verbose = False
+    __verbose = 0
     __output_file = None
     __queue_number = 10
     __time_shifter = False
@@ -93,7 +93,7 @@ class Receiver:
         else:
             self.__actual_byte = self.__actual_byte | 0b00000001
 
-        if self.__verbose:
+        if self.__verbose > 1:
             print("Receiving bit '" + new_bit + "' in " + where)
             if self.__next_bit == 7:
                 print("New character received : '" + str(self.__actual_byte) + "'")
