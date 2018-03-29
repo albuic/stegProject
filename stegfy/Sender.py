@@ -76,6 +76,14 @@ class Sender:
 
             # TODO: test if packet is an IP packet and can be used
             if self.__fields_shifter:
+                # Verbose modes
+                if self.__verbose > 1:
+                    print("packet.id before : " + str(pkt.id))
+                if self.__verbose > 4:
+                    print("Before : *************\n")
+                    pkt.show()
+                    print("**********************")
+
                 if self.__tcp_acknowledge_sequence_number_field:
                     # TODO: test if tcp packet
                     pass
@@ -86,13 +94,6 @@ class Sender:
                     for index, my_char in enumerate(self.__ip_packet_identification_field_mask):
                         if my_char == "1":
                             bit_to_send = self.get_next_bit("IP Packet Identification field")
-
-                            if self.__verbose > 1:
-                                print("packet.id before : " + str(pkt.id))
-                            if self.__verbose > 4:
-                                print("Before : *************\n")
-                                pkt.show()
-                                print("**********************")
 
                             char_mask = ''
                             if bit_to_send == 0:
@@ -112,20 +113,21 @@ class Sender:
                                 int_mask = int(char_mask, 2)
                                 pkt.id = pkt.id | int_mask
 
-                            del pkt.chksum
-                            pkt = pkt.__class__(bytes(pkt))
-
-                            if self.__verbose > 1:
-                                print("packet.id after :  " + str(pkt.id))
-                            if self.__verbose > 4:
-                                print("After : **************\n")
-                                pkt.show()
-                                print("**********************")
-
                 if self.__ip_do_not_fragment_field:
                     # TODO
                     pass
                 packet.set_payload(bytes(pkt))
+
+                del pkt.chksum
+                pkt = pkt.__class__(bytes(pkt))
+
+                # Verbose modes
+                if self.__verbose > 1:
+                    print("packet.id after :  " + str(pkt.id))
+                if self.__verbose > 4:
+                    print("After : **************\n")
+                    pkt.show()
+                    print("**********************")
 
             if self.__time_shifter:
                 #TODO
