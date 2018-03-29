@@ -85,8 +85,9 @@ class Sender:
                     print("**********************")
 
                 if self.__tcp_acknowledge_sequence_number_field:
-                    # TODO: test if tcp packet
-                    pass
+                    # TODO: Probably not as it must use bouncing (and so another machine)
+                    print("ERROR : --tcp-acknowledge-sequence-number-field not implemented.")
+                    exit(3)
                 if self.__tcp_initial_sequence_number_field:
                     # TODO: test if tcp packet
                     pass

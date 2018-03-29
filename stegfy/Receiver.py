@@ -65,8 +65,8 @@ class Receiver:
         # TODO: test if packet is an IP packet and can be used
         if self.__fields_shifter:
             if self.__tcp_acknowledge_sequence_number_field:
-                # TODO: test if tcp packet
-                pass
+                print("ERROR : --tcp-acknowledge-sequence-number-field not implemented.")
+                exit(3)
             if self.__tcp_initial_sequence_number_field:
                 # TODO: test if tcp packet
                 pass
