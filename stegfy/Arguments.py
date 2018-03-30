@@ -4,6 +4,10 @@ import sys
 
 from pathlib import Path
 
+import logging
+
+logger = logging.getLogger('root')
+
 
 class Arguments:
     verbose = 0
@@ -37,169 +41,171 @@ class Arguments:
     def get_arguments(self, argv):
         try:
             if argv[0] != "sudo":
-                opts, args = getopt.getopt(argv[1:], "hi:o:q:rst:v:w:x:y:z:1234m:", ["help", "verbose=", "receiver", "sender", "input-file=", "output-file=", "queue-number=", "one-lower-limit=", "one-upper-limit=", "input-string=", "treshold=", "time-shifter", "fields-shifter", "zero-lower-limit=", "zero-upper-limit=", "tcp-acknowledge-sequence-number-field", "tcp-initial-sequence-number-field", "ip-packet-identification-field", "ip-do-not-fragment-field", "mask="])
+                opts, args = getopt.getopt(argv[1:], 'hi:o:q:rst:v:w:x:y:z:1234m:', ['help', 'verbose=', 'receiver', 'sender', 'input-file=', 'output-file=', 'queue-number=', 'one-lower-limit=', 'one-upper-limit=', 'input-string=', 'treshold=', 'time-shifter', 'fields-shifter', 'zero-lower-limit=', 'zero-upper-limit=', 'tcp-acknowledge-sequence-number-field', 'tcp-initial-sequence-number-field', 'ip-packet-identification-field', 'ip-do-not-fragment-field', 'mask='])
             else:
-                opts, args = getopt.getopt(argv[2:], "hi:o:q:rst:v:w:x:y:z:1234m:", ["help", "verbose=", "receiver", "sender", "input-file=", "output-file=", "queue-number=", "one-lower-limit=", "one-upper-limit=", "input-string=", "treshold=", "time-shifter", "fields-shifter", "zero-lower-limit=", "zero-upper-limit=", "tcp-acknowledge-sequence-number-field", "tcp-initial-sequence-number-field", "ip-packet-identification-field", "ip-do-not-fragment-field", "mask="])
+                opts, args = getopt.getopt(argv[2:], 'hi:o:q:rst:v:w:x:y:z:1234m:', ['help', 'verbose=', 'receiver', 'sender', 'input-file=', 'output-file=', 'queue-number=', 'one-lower-limit=', 'one-upper-limit=', 'input-string=', 'treshold=', 'time-shifter', 'fields-shifter', 'zero-lower-limit=', 'zero-upper-limit=', 'tcp-acknowledge-sequence-number-field', 'tcp-initial-sequence-number-field', 'ip-packet-identification-field', 'ip-do-not-fragment-field', 'mask='])
         except getopt.GetoptError as err:
-            print(err)
+            logger.error(err)
+            logger.error('Please see help below')
             Arguments.help()
             sys.exit(2)
 
         for opt, arg in opts:
-            if opt in ("-h", "--help"):
+            if opt in ('-h', '--help'):
                 Arguments.help()
                 sys.exit()
-            elif opt in ("-v", "--verbose"):
+            elif opt in ('-v', '--verbose'):
                 try:
                     self.verbose = int(arg)
                 except ValueError:
-                    print("ERROR : Verbose level '" + arg + "' is not an integer.")
+                    logger.error('Verbose level "' + arg + '" is not an integer.')
                     sys.exit(2)
-            elif opt in ("-i", "--input-file"):
+            elif opt in ('-i', '--input-file'):
                 self.input_file = arg
                 if not Path(self.input_file).is_file():
-                    print("ERROR : Input file " + arg + " does not exist.")
+                    logger.error('Input file "' + arg + '" does not exist.')
                     sys.exit(2)
                 self.sender = True
-            elif opt in ("-o", "--output-file"):
+            elif opt in ('-o', '--output-file'):
                 self.output_file = arg
                 self.receiver = True
-            elif opt in ("-r", "--receiver"):
+            elif opt in ('-r', '--receiver'):
                 self.receiver = True
-            elif opt in ("-s", "--sender"):
+            elif opt in ('-s', '--sender'):
                 self.sender = True
-            elif opt in ("--input-string"):
+            elif opt in ('--input-string'):
                 self.input_string = arg
                 self.sender = True
-            elif opt in ("-q", "--queue-number"):
+            elif opt in ('-q', '--queue-number'):
                 try:
                     self.queue_number = int(arg)
                 except ValueError:
-                    print("ERROR : Queue number '" + arg + "' is not an integer.")
+                    logger.error('Queue number "' + arg + '" is not an integer.')
                     sys.exit(2)
-            elif opt in ("-y", "--one-lower-limit"):
+            elif opt in ('-y', '--one-lower-limit'):
                 try:
                     self.one_lower_limit = int(arg)
                 except ValueError:
-                    print("ERROR : One lower limit '" + arg + "' is not an integer.")
+                    logger.error('One lower limit "' + arg + '" is not an integer.')
                     sys.exit(2)
                 self.time_shifter = True
-            elif opt in ("-z", "--one-upper-limit"):
+            elif opt in ('-z', '--one-upper-limit'):
                 try:
                     self.one_upper_limit = int(arg)
                 except ValueError:
-                    print("ERROR : One upper limit '" + arg + "' is not an integer.")
+                    logger.error('One upper limit "' + arg + '" is not an integer.')
                     sys.exit(2)
                 self.time_shifter = True
-            elif opt in ("-w", "--zero-lower-limit"):
+            elif opt in ('-w', '--zero-lower-limit'):
                 try:
                     self.zero_lower_limit = int(arg)
                 except ValueError:
-                    print("ERROR : Zero lower limit '" + arg + "' is not an integer.")
+                    logger.error('Zero lower limit "' + arg + '" is not an integer.')
                     sys.exit(2)
                 self.time_shifter = True
-            elif opt in ("-x", "--zero-upper-limit"):
+            elif opt in ('-x', '--zero-upper-limit'):
                 try:
                     self.zero_upper_limit = int(arg)
                 except ValueError:
-                    print("ERROR : Zero upper limit '" + arg + "' is not an integer.")
+                    logger.error('Zero upper limit "' + arg + '" is not an integer.')
                     sys.exit(2)
                 self.time_shifter = True
-            elif opt in ("-t", "--treshold"):
+            elif opt in ('-t', '--treshold'):
                 try:
                     self.treshold = int(arg)
                 except ValueError:
-                    print("ERROR : Treshold '" + arg + "' is not an integer.")
+                    logger.error('Treshold "' + arg + '" is not an integer.')
                     sys.exit(2)
                 self.time_shifter = True
-            elif opt in ("-1", "--tcp-acknowledge-sequence-number-field"):
+            elif opt in ('-1', '--tcp-acknowledge-sequence-number-field'):
                 self.tcp_acknowledge_sequence_number_field = True
                 self.fields_shifter = True
-            elif opt in ("-2", "--tcp-initial-sequence-number-field"):
+            elif opt in ('-2', '--tcp-initial-sequence-number-field'):
                 self.tcp_initial_sequence_number_field = True
                 self.fields_shifter = True
-            elif opt in ("-3", "--ip-packet-identification-field"):
+            elif opt in ('-3', '--ip-packet-identification-field'):
                 self.ip_packet_identification_field = True
                 self.fields_shifter = True
-            elif opt in ("-4", "--ip-do-not-fragment-field"):
+            elif opt in ('-4', '--ip-do-not-fragment-field'):
                 self.ip_do_not_fragment_field = True
                 self.fields_shifter = True
-            elif opt in ("--time-shifter"):
+            elif opt in ('--time-shifter'):
                 self.time_shifter = True
-            elif opt in ("--fields-shifter"):
+            elif opt in ('--fields-shifter'):
                 self.fields_shifter = True
-            elif opt in ("-m", "--mask"):
+            elif opt in ('-m', '--mask'):
                 if len(arg) != 16:
-                    print("ERROR : Mask '" + arg + "' is not a 16 character string representing a mask.")
+                    logger.error('Mask "' + arg + '" is not a 16 character string representing a mask.')
                     sys.exit(2)
                 for my_char in arg:
                     if my_char != '0' and my_char != '1':
-                        print("ERROR : Mask '" + arg + "' contained unkown character.")
+                        logger.error('Mask "' + arg + '" contained unkown character(s).')
                         sys.exit(2)
                 self.ip_packet_identification_field_mask = arg
 
 
     def test_and_show_configuration(self):
-        # Testing sender or receiver mode only and print result
+        # Testing sender or receiver mode only and log result
         if self.sender and self.receiver:
-            print("ERROR : Cannot use both sender and receiver mode at the same time.")
+            logger.error('Cannot use both sender and receiver mode at the same time.')
             sys.exit(2)
         elif self.sender:
-            print("Using sender mode.")
+            logger.debug("Using sender mode.")
         elif self.receiver:
-            print("Using receiver mode.")
+            logger.debug("Using receiver mode.")
         else:
-            print("Receiver or Sender mode not set.")
+            logger.warning("Receiver or Sender mode not set.")
             self.receiver = True
-            print("Using receiver mode as default mode.")
+            logger.warning("Using receiver mode as default mode.")
 
-        print("Using queue : '" + str(self.queue_number) + "'.")
+        logger.debug('Using queue : "' + str(self.queue_number) + '".')
 
         # Testing file and input string
         if self.sender:
             if self.input_file != None:
-                print("Using input file : '" + self.input_file + "'.")
+                logger.debug('Using input file : "' + self.input_file + '".')
             elif self.input_string != None:
                 if len(self.input_string) > 0:
-                    print("Using input string :\n\n" + self.input_string + "\n")
+                    logger.debug('Using input string :\n\n' + self.input_string + '\n')
                 else:
-                    print("ERROR : Input string is empty.")
+                    logger.error('Input string is empty.')
+                    sys.exit(2)
             else:
-                print("ERROR : Input file or input string not set.")
+                logger.error('Input file or input string not set.')
                 sys.exit(2)
         else:
             if self.output_file != None:
-                print("Using output file : " + self.output_file + "'.")
+                logger.debug('Using output file : "' + self.output_file + '".')
             else:
-                print("Not using output files.")
+                logger.debug('Not using output files.')
 
         # Testing Time Shifter or Fields Shifter
         if not self.time_shifter and not self.fields_shifter:
-            print("Time Shifter or Fields Shifter mode not set.")
+            log.warning("Time Shifter or Fields Shifter mode not set.")
             self.time_shifter = True
-            print("Using Time Shifter as a default mode.")
+            log.warning("Using Time Shifter as a default mode.")
 
         # Testing lower/upper limits and treshold (Time Shifter setup)
         if self.time_shifter:
             if self.zero_lower_limit > self.zero_upper_limit:
-                print("ERROR : The zero lower limit ('" + str(self.zero_lower_limit) + "') is greater than the zero upper limit ('" + str(self.zero_upper_limit) + "').")
+                logger.error('The zero lower limit ("' + str(self.zero_lower_limit) + '") is greater than the zero upper limit ("' + str(self.zero_upper_limit) + '").')
                 sys.exit(2)
             if self.one_lower_limit > self.one_upper_limit:
-                print("ERROR : The one lower limit ('" + str(self.one_lower_limit) + "') is greater than the one upper limit ('" + str(self.one_upper_limit) + "').")
+                logger.error('The one lower limit ("' + str(self.one_lower_limit) + '") is greater than the one upper limit ("' + str(self.one_upper_limit) + '").')
                 sys.exit(2)
-            print("The treshold is " + str(self.treshold) + ".\n"
+            logger.debug("The treshold is " + str(self.treshold) + ".\n"
                   "The one lower limit is " + str(self.one_lower_limit) + ".\n"
                   "The one upper limit is " + str(self.one_upper_limit) + ".\n"
                   "The zero lower limit is " + str(self.zero_lower_limit) + ".\n"
                   "The zero upper limit is " + str(self.zero_upper_limit) + ".\n")
             if self.one_lower_limit < self.treshold:
-                print("WARNING : The one lower limit ('" + str(self.one_lower_limit) + "') is lower than the treshold ('" + str(self.treshold) + "').")
+                logger.warning('The one lower limit ("' + str(self.one_lower_limit) + '") is lower than the treshold ("' + str(self.treshold) + '").')
             if self.zero_upper_limit > self.treshold:
-                print("WARNING : The zero upper limit ('" + str(self.zero_upper_limit) + "') is greater than the treshold ('" + str(self.treshold) + "').")
+                logger.warning('The zero upper limit ("' + str(self.zero_upper_limit) + '") is greater than the treshold ("' + str(self.treshold) + '").')
             if self.zero_lower_limit == self.zero_upper_limit:
-                print("INFO : The zero lower limit equals the zero upper limit ('" + str(self.zero_upper_limit) + "').")
+                logger.warning('The zero lower limit equals the zero upper limit ("' + str(self.zero_upper_limit) + '").')
             if self.one_lower_limit == self.one_upper_limit:
-                print("INFO : The one lower limit equals the one upper limit ('" + str(self.one_upper_limit) + "').")
+                logger.warning('The one lower limit equals the one upper limit ("' + str(self.one_upper_limit) + '").')
 
 
         # Testing Fields Shifter setup
@@ -207,11 +213,10 @@ class Arguments:
                                and not self.tcp_acknowledge_sequence_number_field \
                                and not self.ip_do_not_fragment_field \
                                and not self.ip_packet_identification_field:
-            print("Fields Shifter is set but no fields are set to be used.")
+            logger.warning("Fields Shifter is set but no fields are set to be used.")
             self.ip_do_not_fragment_field = True
-            print("Using the IP Do Not Fragment Field as a default.")
+            logger.warning("Using the IP Do Not Fragment Field as a default.")
 
-        print("\n\n")
 
     @staticmethod
     def help():
