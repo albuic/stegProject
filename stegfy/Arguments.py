@@ -10,7 +10,7 @@ logger = logging.getLogger('root')
 
 
 class Arguments:
-    verbose = 'warning'
+    verbose = 'normal'
     receiver = False
     sender = False
     input_file = None
@@ -55,10 +55,10 @@ class Arguments:
                 Arguments.help()
                 sys.exit()
             elif opt in ('-v', '--verbose'):
-                if arg in ('critical', 'error', 'warning', 'info', 'debug'):
+                if arg in ('critical', 'error', 'warning', 'normal', 'info', 'debug', 'trace'):
                     self.verbose = arg
                 else:
-                    logger.error('Verbose level "' + arg + '" is not an verbose level ("critical", "error", "warning", "info", "debug").')
+                    logger.error('Verbose level "' + arg + '" is not an verbose level ("critical", "error", "warning", "normal", "info", "debug", "trace").')
                     sys.exit(2)
             elif opt in ('-i', '--input-file'):
                 self.input_file = arg
@@ -250,7 +250,7 @@ class Arguments:
               "Options :                                                                                                           \n"
               "    '-h' or '--help'                                      Show this help and exit                                   \n"
               "    '-v' or '--verbose'                                   Set verbose level: it must be one of 'critical', 'error', \n"
-              "                                                          'warning', 'info', 'debug'                                \n"
+              "                                                          'warning', 'normal', 'info', 'debug', 'trace'             \n"
               "                                                            Default : warning                                       \n"
               "    '-r' or '--receiver'                                  Start program in receiver mode                            \n"
               "                                                            Default : Receiver mode                                 \n"
