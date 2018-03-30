@@ -119,10 +119,10 @@ class Sender:
                     logger.error('TODO: --ip-do-not-fragment-field')
                     sys.exit(3)
 
-                packet.set_payload(bytes(pkt))
-
                 del pkt.chksum
                 pkt = pkt.__class__(bytes(pkt))
+
+                packet.set_payload(bytes(pkt))
 
                 # Verbose modes
                 logger.log(5, '*********** After ***********')
