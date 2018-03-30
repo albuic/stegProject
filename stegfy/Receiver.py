@@ -105,7 +105,7 @@ class Receiver:
         logger.debug("Byte content after : " + str(bin(self.__actual_byte)))
 
         if logger.getEffectiveLevel() > 24:
-            sys.stdout.write("\033[F") # Cursor up one line
+            sys.stderr.write("\033[F") # Cursor up one line
 
         if self.__next_bit < 7:
             logger.log(25, "Receiving: " + bin(self.__actual_byte)[2:].zfill(8)[7 - self.__next_bit : 8])

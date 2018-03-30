@@ -145,7 +145,7 @@ class Sender:
         logger.debug("Sending bit '" + str(bit) + "' in " + where)
 
         if logger.getEffectiveLevel() > 24:
-            sys.stdout.write("\033[F") # Cursor up one line
+            sys.stderr.write("\033[F") # Cursor up one line
         if self.__next_bit < 7:
             logger.log(25, "Sending: " + self.__actual_bits[0 : self.__next_bit + 1])
         else:
@@ -153,7 +153,7 @@ class Sender:
 
         if self.__next_bit == 7:
             logger.debug("New character sended : '" + str(self.__actual_byte) + "'")
-        #sys.stdout.flush()
+        #sys.stderr.flush()
 
         self.__next_bit += 1
         if self.__next_bit == 8:
