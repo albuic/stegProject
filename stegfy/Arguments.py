@@ -10,7 +10,7 @@ logger = logging.getLogger('root')
 
 
 class Arguments:
-    verbose = 0
+    verbose = 'warning'
     receiver = False
     sender = False
     input_file = None
@@ -55,10 +55,10 @@ class Arguments:
                 Arguments.help()
                 sys.exit()
             elif opt in ('-v', '--verbose'):
-                try:
-                    self.verbose = int(arg)
-                except ValueError:
-                    logger.error('Verbose level "' + arg + '" is not an integer.')
+                if arg in ('critical', 'error', 'warning', 'info', 'debug'):
+                    self.verbose = arg
+                else:
+                    logger.error('Verbose level "' + arg + '" is not an verbose level ("critical", "error", "warning", "info", "debug").')
                     sys.exit(2)
             elif opt in ('-i', '--input-file'):
                 self.input_file = arg
@@ -145,6 +145,22 @@ class Arguments:
 
 
     def test_and_show_configuration(self):
+        # Set log level
+        if self.verbose == 'critical':
+            logger.setLevel(50)
+        elif self.verbose == 'error':
+            logger.setLevel(40)
+        elif self.verbose == 'warning':
+            logger.setLevel(30)
+        elif self.verbose == 'normal':
+            logger.setLevel(25)
+        elif self.verbose == 'info':
+            logger.setLevel(20)
+        elif self.verbose == 'debug':
+            logger.setLevel(10)
+        elif self.verbose == 'trace':
+            logger.setLevel(5)
+
         # Testing sender or receiver mode only and log result
         if self.sender and self.receiver:
             logger.error('Cannot use both sender and receiver mode at the same time.')
@@ -233,8 +249,9 @@ class Arguments:
               "                                                                                                                    \n"
               "Options :                                                                                                           \n"
               "    '-h' or '--help'                                      Show this help and exit                                   \n"
-              "    '-v' or '--verbose'                                   Set verbose level (Show debug info) from 1 to 5           \n"
-              "                                                            Default : 0                                             \n"
+              "    '-v' or '--verbose'                                   Set verbose level: it must be one of 'critical', 'error', \n"
+              "                                                          'warning', 'info', 'debug'                                \n"
+              "                                                            Default : warning                                       \n"
               "    '-r' or '--receiver'                                  Start program in receiver mode                            \n"
               "                                                            Default : Receiver mode                                 \n"
               "    '-s' or '--sender'                                    Start program in sender mode                              \n"
