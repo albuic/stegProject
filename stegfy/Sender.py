@@ -96,23 +96,14 @@ class Sender:
                         if my_char == "1":
                             bit_to_send = self.get_next_bit('IP Packet Identification field')
 
-                            char_mask = ''
                             if bit_to_send == 0:
-                                for i in range(0, index):
-                                    char_mask += '1'
-                                char_mask += '0'
-                                for i in range(index+1, 16):
-                                    char_mask += '1'
-                                int_mask = int(char_mask, 2)
-                                pkt.id = pkt.id & int_mask
+                                char_mask = '1111111111111111'
+                                char_mask[index] = '0'
+                                pkt.id = pkt.id & int(char_mask, 2)
                             elif bit_to_send == 1:
-                                for i in range(0, index):
-                                    char_mask += '0'
-                                char_mask += '1'
-                                for i in range(index+1, 16):
-                                    char_mask += '0'
-                                int_mask = int(char_mask, 2)
-                                pkt.id = pkt.id | int_mask
+                                char_mask = '0000000000000000'
+                                char_mask[index] = '1'
+                                pkt.id = pkt.id & int(char_mask, 2)
 
                 if self.__ip_do_not_fragment_field:
                     bit_to_send = self.get_next_bit('IP Do Not Fragment field')
