@@ -1,9 +1,12 @@
 from netfilterqueue import NetfilterQueue
 from scapy.all import *
 
+import logging
+
+logger = logging.getLogger('root')
+
 
 class Receiver:
-    __verbose = 0
     __output_file = None
     __queue_number = 10
     __time_shifter = False
@@ -23,8 +26,7 @@ class Receiver:
     __actual_byte = 0
 
 
-    def __init__(self, verbose, output_file, queue_number, time_shifter, fields_shifter, treshold, one_lower_limit, one_upper_limit, zero_lower_limit, zero_upper_limit, tcp_acknowledge_sequence_number_field, tcp_initial_sequence_number_field, ip_packet_identification_field, ip_do_not_fragment_field, ip_packet_identification_field_mask):
-        self.__verbose = verbose
+    def __init__(self, output_file, queue_number, time_shifter, fields_shifter, treshold, one_lower_limit, one_upper_limit, zero_lower_limit, zero_upper_limit, tcp_acknowledge_sequence_number_field, tcp_initial_sequence_number_field, ip_packet_identification_field, ip_do_not_fragment_field, ip_packet_identification_field_mask):
         self.__output_file = output_file
         self.__queue_number = queue_number
         self.__time_shifter = time_shifter
@@ -52,8 +54,7 @@ class Receiver:
         try:
             nfqueue.run()
         except KeyboardInterrupt:
-            print('')
-            print("INTERRUPTION : Stopping Sender.")
+            logger.warning('INTERRUPTION : Stopping Receiver.')
         nfqueue.unbind()
         if self.__output_file != None:
             self.__my_file.close()
@@ -65,30 +66,35 @@ class Receiver:
         # TODO: test if packet is an IP packet and can be used
         if self.__fields_shifter:
             if self.__tcp_acknowledge_sequence_number_field:
-                print("ERROR : --tcp-acknowledge-sequence-number-field not implemented.")
-                exit(3)
+                # TODO: Probably not as it must use bouncing (and so another machine)
+                logger.error('"--tcp-acknowledge-sequence-number-field" not implemented.')
+                sys.exit(3)
             if self.__tcp_initial_sequence_number_field:
                 # TODO: test if tcp packet
-                pass
+                logger.error('TODO: --tcp-initial-sequence-number-field')
             if self.__ip_packet_identification_field:
                 for index, my_char in enumerate(self.__ip_packet_identification_field_mask):
-                    if my_char == "1":
+                    if my_char == '1':
                         new_bit = bin(pkt.id)[2:].zfill(16)[index]
-                        self.add_next_bit(new_bit, "IP Packet Identification field")
+                        self.add_next_bit(new_bit, 'IP Packet Identification field')
             if self.__ip_do_not_fragment_field:
                 # TODO
-                pass
+                logger.error('TODO: --ip-do-not-fragment-field')
+                sys.exit(3)
+
             packet.set_payload(bytes(pkt))
 
         if self.__time_shifter:
             #TODO
-            print("TODO: timeshifter")
+            logger.error('TODO: timeshifter')
+            sys.exit(3)
 
         packet.accept()
 
     def add_next_bit(self, new_bit, where):
-        if self.__verbose > 1:
-            print("byte content before : " + str(bin(self.__actual_byte)))
+        logger.debug("Receiving bit '" + new_bit + "' in " + where)
+
+        logger.debug("Byte content before : " + str(bin(self.__actual_byte)))
 
         self.__actual_byte = self.__actual_byte << 1
         if new_bit == '0':
@@ -96,19 +102,18 @@ class Receiver:
         else:
             self.__actual_byte = self.__actual_byte | 0b00000001
 
-        if self.__verbose > 1:
-            print("Receiving bit '" + new_bit + "' in " + where)
-            print("byte content after : " + str(bin(self.__actual_byte)))
-            if self.__next_bit == 7:
-                print("New character received : '" + chr(self.__actual_byte) + "'")
+        logger.debug("Byte content after : " + str(bin(self.__actual_byte)))
+
+        if logger.getEffectiveLevel() > 24:
+            sys.stdout.write("\033[F") # Cursor up one line
+
+        if self.__next_bit < 7:
+            logger.log(25, "Receiving: " + bin(self.__actual_byte)[2:].zfill(8)[7 - self.__next_bit : 8])
         else:
-            if self.__next_bit == 0:
-                print("Receiving: " + new_bit, end='', flush=True)
-            elif self.__next_bit == 7:
-                print(new_bit + "      ('" + chr(self.__actual_byte) + "')")
-            else:
-                print(new_bit, end='', flush=True)
-            sys.stdout.flush()
+            logger.log(25, "Receiving: " + bin(self.__actual_byte)[2:].zfill(8) + "      ('" + chr(self.__actual_byte) + "')")
+
+        if self.__next_bit == 7:
+            logger.debug("New character received : '" + chr(self.__actual_byte) + "'")
 
         self.__next_bit += 1
         if self.__next_bit == 8:

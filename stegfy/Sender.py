@@ -1,9 +1,12 @@
 from netfilterqueue import NetfilterQueue
 from scapy.all import *
 
+import logging
+
+logger = logging.getLogger('root')
+
 
 class Sender:
-    __verbose = 0
     __input_file = None
     __input_string = None
     __queue_number = 10
@@ -26,8 +29,7 @@ class Sender:
     __actual_bits = None
 
 
-    def __init__(self, verbose, input_file, input_string, queue_number, time_shifter, fields_shifter, treshold, one_lower_limit, one_upper_limit, zero_lower_limit, zero_upper_limit, tcp_acknowledge_sequence_number_field, tcp_initial_sequence_number_field, ip_packet_identification_field, ip_do_not_fragment_field, ip_packet_identification_field_mask):
-        self.__verbose = verbose
+    def __init__(self, input_file, input_string, queue_number, time_shifter, fields_shifter, treshold, one_lower_limit, one_upper_limit, zero_lower_limit, zero_upper_limit, tcp_acknowledge_sequence_number_field, tcp_initial_sequence_number_field, ip_packet_identification_field, ip_do_not_fragment_field, ip_packet_identification_field_mask):
         self.__input_file = input_file
         self.__input_string = input_string
         self.__queue_number = queue_number
@@ -48,7 +50,7 @@ class Sender:
             self.__my_file = open(self.__input_file, 'r')
             self.__actual_byte = self.__my_file.read(1)
             if self.__actual_byte == "":
-                print("ERROR : File is empty")
+                logger.error('File "' + self.__input_file + '" is empty')
                 self.__my_file.close()
                 sys.exit(3)
         else:
@@ -65,8 +67,7 @@ class Sender:
         try:
             nfqueue.run()
         except KeyboardInterrupt:
-            print('')
-            print("INTERRUPTION : Stopping Sender.")
+            logger.warning('INTERRUPTION : Stopping Sender.')
         nfqueue.unbind()
 
     def handler(self, packet):
@@ -77,24 +78,23 @@ class Sender:
             # TODO: test if packet is an IP packet and can be used
             if self.__fields_shifter:
                 # Verbose modes
-                if self.__verbose > 1:
-                    print("packet.id before : " + str(pkt.id))
-                if self.__verbose > 4:
-                    print("Before : *************\n")
+                logger.log(5, '********** Before **********')
+                logger.debug('Before: packet.id : ' + str(pkt.id))
+                if logger.getEffectiveLevel() < 6:
                     pkt.show()
-                    print("**********************")
+                logger.log(5, '****************************')
 
                 if self.__tcp_acknowledge_sequence_number_field:
                     # TODO: Probably not as it must use bouncing (and so another machine)
-                    print("ERROR : --tcp-acknowledge-sequence-number-field not implemented.")
-                    exit(3)
+                    logger.error('"--tcp-acknowledge-sequence-number-field" not implemented.')
+                    sys.exit(3)
                 if self.__tcp_initial_sequence_number_field:
                     # TODO: test if tcp packet
-                    pass
+                    logger.error('TODO: --tcp-initial-sequence-number-field')
                 if self.__ip_packet_identification_field:
                     for index, my_char in enumerate(self.__ip_packet_identification_field_mask):
                         if my_char == "1":
-                            bit_to_send = self.get_next_bit("IP Packet Identification field")
+                            bit_to_send = self.get_next_bit('IP Packet Identification field')
 
                             char_mask = ''
                             if bit_to_send == 0:
@@ -116,23 +116,25 @@ class Sender:
 
                 if self.__ip_do_not_fragment_field:
                     # TODO
-                    pass
+                    logger.error('TODO: --ip-do-not-fragment-field')
+                    sys.exit(3)
+
                 packet.set_payload(bytes(pkt))
 
                 del pkt.chksum
                 pkt = pkt.__class__(bytes(pkt))
 
                 # Verbose modes
-                if self.__verbose > 1:
-                    print("packet.id after :  " + str(pkt.id))
-                if self.__verbose > 4:
-                    print("After : **************\n")
+                logger.log(5, '*********** After ***********')
+                logger.debug('After: packet.id : ' + str(pkt.id))
+                if logger.getEffectiveLevel() < 6:
                     pkt.show()
-                    print("**********************")
+                logger.log(5, '*****************************')
 
             if self.__time_shifter:
                 #TODO
-                print("TODO: timeshifter")
+                logger.error('TODO: timeshifter')
+                sys.exit(3)
 
         packet.accept()
 
@@ -140,19 +142,18 @@ class Sender:
     def get_next_bit(self, where):
         bit = self.__actual_bits[self.__next_bit]
 
-        if self.__verbose > 1:
-            print("Sending bit '" + str(bit) + "' in " + where)
-            if self.__next_bit == 7:
-                print("New character sended : '" + str(self.__actual_byte) + "'")
-        else:
-            if self.__next_bit == 0:
-                print("Sending: " + str(bit), end='', flush=True)
-            elif self.__next_bit == 7:
-                print(str(bit) + "      ('" + self.__actual_byte + "')")
-            else:
-                print(str(bit), end='', flush=True)
-            sys.stdout.flush()
+        logger.debug("Sending bit '" + str(bit) + "' in " + where)
 
+        if logger.getEffectiveLevel() > 24:
+            sys.stdout.write("\033[F") # Cursor up one line
+        if self.__next_bit < 7:
+            logger.log(25, "Sending: " + self.__actual_bits[0 : self.__next_bit + 1])
+        else:
+            logger.log(25, "Sending: " + self.__actual_bits[0 : self.__next_bit + 1] + "  ('" + self.__actual_byte + "')")
+
+        if self.__next_bit == 7:
+            logger.debug("New character sended : '" + str(self.__actual_byte) + "'")
+        #sys.stdout.flush()
 
         self.__next_bit += 1
         if self.__next_bit == 8:
@@ -168,9 +169,8 @@ class Sender:
             self.__actual_bits = bin(ord(self.__actual_byte))[2:].zfill(8)
 
             if (self.__input_file != None) and (self.__actual_byte == ""):
-                print("File has been sent.\nNow sending everything without any encoding.")
+                logger.log(25, 'File has been sent.\nNow sending everything without any encoding.')
             elif (self.__input_string != None) and (len(self.__input_string) < self.__next_byte + 1):
-                print("String has been sent.\nNow sending everything without any encoding.")
-
+                logger.log(25, 'String has been sent.\nNow sending everything without any encoding.')
 
         return 0 if bit == '0' else 1
