@@ -115,9 +115,12 @@ class Sender:
                                 pkt.id = pkt.id | int_mask
 
                 if self.__ip_do_not_fragment_field:
-                    # TODO
-                    logger.error('TODO: --ip-do-not-fragment-field')
-                    sys.exit(3)
+                    bit_to_send = self.get_next_bit('IP Do Not Fragment field')
+
+                    if bit_to_send == 0:
+                        pkt[IP].flags = 0
+                    elif bit_to_send == 1:
+                        pkt[IP].flags = 2
 
                 del pkt.chksum
                 pkt = pkt.__class__(bytes(pkt))

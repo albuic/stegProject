@@ -78,10 +78,7 @@ class Receiver:
                         new_bit = bin(pkt.id)[2:].zfill(16)[index]
                         self.add_next_bit(new_bit, 'IP Packet Identification field')
             if self.__ip_do_not_fragment_field:
-                # TODO
-                logger.error('TODO: --ip-do-not-fragment-field')
-                sys.exit(3)
-
+                self.add_next_bit(bin(pkt[IP].flags)[2], 'IP Do Not Fragment field')
             packet.set_payload(bytes(pkt))
 
         if self.__time_shifter:
