@@ -110,7 +110,7 @@ class Receiver:
         if self.__next_bit < 7:
             logger.log(25, "Receiving: " + bin(self.__actual_byte)[2:].zfill(8)[7 - self.__next_bit : 8])
         else:
-            logger.log(25, "Receiving: " + bin(self.__actual_byte)[2:].zfill(8) + "      ('" + chr(self.__actual_byte) + "')")
+            logger.log(25, "Receiving: " + bin(self.__actual_byte)[2:].zfill(8) + "      ('" + chr(self.__actual_byte) + "')\n")
 
         if self.__next_bit == 7:
             logger.debug("New character received : '" + chr(self.__actual_byte) + "'")
