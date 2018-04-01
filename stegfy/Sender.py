@@ -73,9 +73,13 @@ class Sender:
     def handler(self, packet):
         if not ( (self.__input_file != None) and (self.__actual_byte == "") ) and not ( (self.__input_string != None) and (len(self.__input_string) < self.__next_byte + 1) ):
             payload = packet.get_payload()
-            pkt = IP(payload)
+            try:
+                pkt = IP(payload)
+            except:
+                logger.warning('Packet is not an IP packet')
+                packet.accept()
 
-            # TODO: test if packet is an IP packet and can be used
+
             if self.__fields_shifter:
                 # Verbose modes
                 logger.log(5, '********** Before **********')
