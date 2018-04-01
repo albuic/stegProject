@@ -108,6 +108,8 @@ class Sender:
                                         pkt[TCP].seq = pkt[TCP].seq & ( (2**32-1)-(2**index) )
                                     elif bit_to_send == 1:
                                         pkt[TCP].seq = pkt[TCP].seq & (2**index)
+                            del pkt[TCP].chksum
+                            pkt = pkt.__class__(bytes(pkt))
                         else:
                             logger.info('Packet is not an initial connection packet, cannot use the TCP Initial Sequence Number field.')
                     else:
