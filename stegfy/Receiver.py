@@ -21,12 +21,13 @@ class Receiver:
     __ip_packet_identification_field = False
     __ip_do_not_fragment_field = False
     __ip_packet_identification_field_mask = '0000000000000001'
+    __tcp_initial_sequence_number_field_mask = '11111111111111111111111111111111'
     __my_file = None
     __next_bit = 0
     __actual_byte = 0
 
 
-    def __init__(self, output_file, queue_number, time_shifter, fields_shifter, treshold, one_lower_limit, one_upper_limit, zero_lower_limit, zero_upper_limit, tcp_acknowledge_sequence_number_field, tcp_initial_sequence_number_field, ip_packet_identification_field, ip_do_not_fragment_field, ip_packet_identification_field_mask):
+    def __init__(self, output_file, queue_number, time_shifter, fields_shifter, treshold, one_lower_limit, one_upper_limit, zero_lower_limit, zero_upper_limit, tcp_acknowledge_sequence_number_field, tcp_initial_sequence_number_field, ip_packet_identification_field, ip_do_not_fragment_field, ip_packet_identification_field_mask, tcp_initial_sequence_number_field_mask):
         self.__output_file = output_file
         self.__queue_number = queue_number
         self.__time_shifter = time_shifter
@@ -41,6 +42,7 @@ class Receiver:
         self.__ip_packet_identification_field = ip_packet_identification_field
         self.__ip_do_not_fragment_field = ip_do_not_fragment_field
         self.__ip_packet_identification_field_mask = ip_packet_identification_field_mask
+        self.__tcp_initial_sequence_number_field_mask = tcp_initial_sequence_number_field_mask
 
         if self.__output_file != None:
             self.__my_file = file(self.__output_file, 'w')
@@ -69,9 +71,21 @@ class Receiver:
                 # TODO: Probably not as it must use bouncing (and so another machine)
                 logger.error('"--tcp-acknowledge-sequence-number-field" not implemented.')
                 sys.exit(3)
+
             if self.__tcp_initial_sequence_number_field:
-                # TODO: test if tcp packet
-                logger.error('TODO: --tcp-initial-sequence-number-field')
+                if TCP in pkt:
+                    # Testing if packet is the first packet of a connection and can be used (0x02 is the bitmap SYN flag)
+                    if pkt[TCP].flags & 0x02:
+                        logger.info('Packet is an initial connection packet, using the TCP Initial Sequence Number field.')
+                        for index, my_char in enumerate(self.__tcp_initial_sequence_number_field_mask):
+                            if my_char == "1":
+                                new_bit = bin(pkt[TCP].seq)[2:].zfill(32)[index]
+                                self.add_next_bit(new_bit, 'TCP Initial Sequence Number field')
+                    else:
+                        logger.info('Packet is not an initial connection packet, cannot use the TCP Initial Sequence Number field.')
+                else:
+                    logger.info('Packet is not a TCP packet, cannot use the TCP Initial Sequence Number field.')
+
             if self.__ip_packet_identification_field:
                 for index, my_char in enumerate(self.__ip_packet_identification_field_mask):
                     if my_char == '1':

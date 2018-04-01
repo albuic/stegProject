@@ -29,7 +29,7 @@ class Arguments:
     ip_packet_identification_field = False
     ip_do_not_fragment_field = False
     ip_packet_identification_field_mask = '0000000000000001'
-
+    tcp_initial_sequence_number_field_mask = '11111111111111111111111111111111'
 
     def __init__(self, argv = None):
         if argv is None:
@@ -41,9 +41,9 @@ class Arguments:
     def get_arguments(self, argv):
         try:
             if argv[0] != "sudo":
-                opts, args = getopt.getopt(argv[1:], 'hi:o:q:rst:v:w:x:y:z:1234m:', ['help', 'verbose=', 'receiver', 'sender', 'input-file=', 'output-file=', 'queue-number=', 'one-lower-limit=', 'one-upper-limit=', 'input-string=', 'treshold=', 'time-shifter', 'fields-shifter', 'zero-lower-limit=', 'zero-upper-limit=', 'tcp-acknowledge-sequence-number-field', 'tcp-initial-sequence-number-field', 'ip-packet-identification-field', 'ip-do-not-fragment-field', 'mask='])
+                opts, args = getopt.getopt(argv[1:], 'hi:o:q:rst:v:w:x:y:z:1234m:n:', ['help', 'verbose=', 'receiver', 'sender', 'input-file=', 'output-file=', 'queue-number=', 'one-lower-limit=', 'one-upper-limit=', 'input-string=', 'treshold=', 'time-shifter', 'fields-shifter', 'zero-lower-limit=', 'zero-upper-limit=', 'tcp-acknowledge-sequence-number-field', 'tcp-initial-sequence-number-field', 'ip-packet-identification-field', 'ip-do-not-fragment-field', 'ip-mask=', 'tcp-mask='])
             else:
-                opts, args = getopt.getopt(argv[2:], 'hi:o:q:rst:v:w:x:y:z:1234m:', ['help', 'verbose=', 'receiver', 'sender', 'input-file=', 'output-file=', 'queue-number=', 'one-lower-limit=', 'one-upper-limit=', 'input-string=', 'treshold=', 'time-shifter', 'fields-shifter', 'zero-lower-limit=', 'zero-upper-limit=', 'tcp-acknowledge-sequence-number-field', 'tcp-initial-sequence-number-field', 'ip-packet-identification-field', 'ip-do-not-fragment-field', 'mask='])
+                opts, args = getopt.getopt(argv[2:], 'hi:o:q:rst:v:w:x:y:z:1234m:n:', ['help', 'verbose=', 'receiver', 'sender', 'input-file=', 'output-file=', 'queue-number=', 'one-lower-limit=', 'one-upper-limit=', 'input-string=', 'treshold=', 'time-shifter', 'fields-shifter', 'zero-lower-limit=', 'zero-upper-limit=', 'tcp-acknowledge-sequence-number-field', 'tcp-initial-sequence-number-field', 'ip-packet-identification-field', 'ip-do-not-fragment-field', 'ip-mask=' 'tcp-mask='])
         except getopt.GetoptError as err:
             logger.error(err)
             logger.error('Please see help below')
@@ -133,15 +133,24 @@ class Arguments:
                 self.time_shifter = True
             elif opt in ('--fields-shifter'):
                 self.fields_shifter = True
-            elif opt in ('-m', '--mask'):
+            elif opt in ('-m', '--ip-mask'):
                 if len(arg) != 16:
-                    logger.error('Mask "' + arg + '" is not a 16 character string representing a mask.')
+                    logger.error('Mask "' + arg + '" is not a 16 character string representing a IP Packet Identification field mask.')
                     sys.exit(2)
                 for my_char in arg:
                     if my_char != '0' and my_char != '1':
                         logger.error('Mask "' + arg + '" contained unkown character(s).')
                         sys.exit(2)
                 self.ip_packet_identification_field_mask = arg
+            elif opt in ('-n', '--tcp-mask'):
+                if len(arg) != 32:
+                    logger.error('Mask "' + arg + '" is not a 32 character string representing a TCP Initial Sequence Number field mask.')
+                    sys.exit(2)
+                for my_char in arg:
+                    if my_char != '0' and my_char != '1':
+                        logger.error('Mask "' + arg + '" contained unkown character(s).')
+                        sys.exit(2)
+                self.tcp_initial_sequence_number_field_mask = arg
 
 
     def test_and_show_configuration(self):
@@ -285,9 +294,12 @@ class Arguments:
               "    '-4' or '--ip-do-not-fragment-field'                  Using the 'Do Not Fragment field'                         \n"
               "                                                            Default : Not activated but used if no other are set    \n"
               "                                                                      and '--fields-shifter' is set                 \n"
-              "    'm <mask>' or '--mask <mask>'                         A string representing a 16 bit mask to set which bit of   \n"
-              "                                                          the Identification field to use (like '0000000100000000') \n"
+              "    'm <mask>' or '--ip-mask <mask>'                      A string representing a 16 bit mask to set which bit of   \n"
+              "                                                          the IP Identification field to use                        \n"
               "                                                            Default : '0000000000000001'                            \n"
+              "    'n <mask>' or '--tcp-mask <mask>'                     A string representing a 32 bit mask to set which bit of   \n"
+              "                                                          the TCP Initial Sequence Number field to use              \n"
+              "                                                            Default : '11111111111111111111111111111111'            \n"
               "                                                                                     \n"
               "                                                                                     \n"
               "              ^                                                                      \n"
