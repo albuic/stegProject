@@ -105,13 +105,9 @@ class Sender:
                                     bit_to_send = self.get_next_bit('TCP Initial Sequence Number field')
 
                                     if bit_to_send == 0:
-                                        char_mask = '11111111111111111111111111111111'
-                                        char_mask[index] = '0'
-                                        pkt[TCP].seq = pkt[TCP].seq & int(char_mask, 2)
+                                        pkt[TCP].seq = pkt[TCP].seq & ( (2**32-1)-(2**index) )
                                     elif bit_to_send == 1:
-                                        char_mask = '00000000000000000000000000000000'
-                                        char_mask[index] = '1'
-                                        pkt[TCP].seq = pkt[TCP].seq & int(char_mask, 2)
+                                        pkt[TCP].seq = pkt[TCP].seq & (2**index)
                         else:
                             logger.info('Packet is not an initial connection packet, cannot use the TCP Initial Sequence Number field.')
                     else:
@@ -123,13 +119,9 @@ class Sender:
                             bit_to_send = self.get_next_bit('IP Packet Identification field')
 
                             if bit_to_send == 0:
-                                char_mask = '1111111111111111'
-                                char_mask[index] = '0'
-                                pkt.id = pkt.id & int(char_mask, 2)
+                                pkt.id = pkt.id & ( (2**32-1)-(2**index) )
                             elif bit_to_send == 1:
-                                char_mask = '0000000000000000'
-                                char_mask[index] = '1'
-                                pkt.id = pkt.id & int(char_mask, 2)
+                                pkt.id = pkt.id & (2**index)
 
                 if self.__ip_do_not_fragment_field:
                     bit_to_send = self.get_next_bit('IP Do Not Fragment field')
