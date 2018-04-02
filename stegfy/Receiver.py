@@ -114,7 +114,7 @@ class Receiver:
                 logger.debug('Initialazing the "__last_packet_arriving_time" (' + str(self.__last_packet_arriving_time) + ')')
             else:
                 new_time = int(round(time.time() * 1000))
-                delay = self.__last_packet_arriving_time - new_time
+                delay = new_time - self.__last_packet_arriving_time
                 self.__last_packet_arriving_time = new_time
                 logger.debug('New value for the "__last_packet_arriving_time" (' + str(self.__last_packet_arriving_time) + ')')
 
