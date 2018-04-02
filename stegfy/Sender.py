@@ -180,8 +180,7 @@ class Sender:
     def get_next_bit(self, where):
         if self.__next_bit <= 7:
             bit = self.__actual_bits[self.__next_bit]
-
-        logger.debug('Sending bit "' + str(bit) + '" in ' + where)
+            logger.debug('Sending bit "' + str(bit) + '" in ' + where)
 
         if logger.getEffectiveLevel() > 24:
             sys.stderr.write('\033[F') # Cursor up one line
