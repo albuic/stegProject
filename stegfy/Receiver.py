@@ -111,12 +111,12 @@ class Receiver:
         if self.__time_shifter:
             if self.__first_packet:
                 self.__last_packet_arriving_time = int(round(time.time() * 1000))
-                logger.debug('Initialazing the "__last_packet_arriving_time" (' + self.__last_packet_arriving_time + ')')
+                logger.debug('Initialazing the "__last_packet_arriving_time" (' + str(self.__last_packet_arriving_time) + ')')
             else:
                 new_time = int(round(time.time() * 1000))
                 delay = self.__last_packet_arriving_time - new_time
                 self.__last_packet_arriving_time = new_time
-                logger.debug('New value for the "__last_packet_arriving_time" (' + self.__last_packet_arriving_time + ')')
+                logger.debug('New value for the "__last_packet_arriving_time" (' + str(self.__last_packet_arriving_time) + ')')
 
                 if delay <= self.__treshold:
                     self.add_next_bit('0', 'Time Shifter')
