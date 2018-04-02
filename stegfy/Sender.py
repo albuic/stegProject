@@ -72,7 +72,7 @@ class Sender:
         nfqueue.unbind()
 
     def handler(self, packet):
-        if not self.__string_or_file_sended and not self.__last_null_byte_sended:
+        if not self.__string_or_file_sended or not self.__last_null_byte_sended:
             payload = packet.get_payload()
             try:
                 pkt = IP(payload)
@@ -213,10 +213,12 @@ class Sender:
                 logger.log(25, 'File has been sent. Now sending a "EOT" (end of transmission) byte then nothing.\n')
             elif self.__string_or_file_sended and not self.__last_null_byte_sended and self.__input_string != None:
                 logger.log(25, 'String has been sent. Now sending a "EOT" (end of transmission) byte then nothing.\n')
+
             if self.__string_or_file_sended and self.__last_null_byte_sended:
                 logger.debug('File or String has been sent. Nothing to send.')
                 self.__next_bit = 7
                 return 3
+
             if self.__string_or_file_sended and not self.__last_null_byte_sended:
                 self.__actual_byte = '\x04'
                 self.__last_null_byte_sended = True
