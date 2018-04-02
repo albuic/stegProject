@@ -67,6 +67,16 @@ class Receiver:
 
         # TODO: test if packet is an IP packet and can be used
         if self.__fields_shifter:
+            logger.log(5, '****************************')
+            logger.debug('Content: packet.id : ' + str(pkt.id))
+            logger.debug('Content: packet.chksum : ' + str(pkt.chksum))
+            if TCP in pkt:
+                logger.debug('Content: packet[TCP].seq : ' + str(pkt[TCP].seq))
+                logger.debug('Content: packet[TCP].chksum : ' + str(pkt[TCP].chksum))
+            if logger.getEffectiveLevel() < 6:
+                pkt.show()
+            logger.log(5, '****************************')
+
             if self.__tcp_acknowledge_sequence_number_field:
                 # TODO: Probably not as it must use bouncing (and so another machine)
                 logger.error('"--tcp-acknowledge-sequence-number-field" not implemented.')

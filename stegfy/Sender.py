@@ -86,6 +86,10 @@ class Sender:
                 # Verbose modes
                 logger.log(5, '********** Before **********')
                 logger.debug('Before: packet.id : ' + str(pkt.id))
+                logger.debug('Before: packet.chksum : ' + str(pkt.chksum))
+                if TCP in pkt:
+                    logger.debug('Before: packet[TCP].seq : ' + str(pkt[TCP].seq))
+                    logger.debug('Before: packet[TCP].chksum : ' + str(pkt[TCP].chksum))
                 if logger.getEffectiveLevel() < 6:
                     pkt.show()
                 logger.log(5, '****************************')
@@ -141,6 +145,10 @@ class Sender:
                 # Verbose modes
                 logger.log(5, '*********** After ***********')
                 logger.debug('After: packet.id : ' + str(pkt.id))
+                logger.debug('After: packet.chksum : ' + str(pkt.chksum))
+                if TCP in pkt:
+                    logger.debug('After: packet[TCP].seq : ' + str(pkt[TCP].seq))
+                    logger.debug('After: packet[TCP].chksum : ' + str(pkt[TCP].chksum))
                 if logger.getEffectiveLevel() < 6:
                     pkt.show()
                 logger.log(5, '*****************************')
