@@ -1,5 +1,7 @@
 from netfilterqueue import NetfilterQueue
 from scapy.all import *
+from time import sleep
+from random import randint
 
 import logging
 
@@ -28,6 +30,7 @@ class Sender:
     __next_byte = 0
     __actual_byte = None
     __actual_bits = None
+    __first_packet = True
 
 
     def __init__(self, input_file, input_string, queue_number, time_shifter, fields_shifter, treshold, one_lower_limit, one_upper_limit, zero_lower_limit, zero_upper_limit, tcp_acknowledge_sequence_number_field, tcp_initial_sequence_number_field, ip_packet_identification_field, ip_do_not_fragment_field, ip_packet_identification_field_mask, tcp_initial_sequence_number_field_mask):
@@ -153,12 +156,17 @@ class Sender:
                     pkt.show()
                 logger.log(5, '*****************************')
 
-            if self.__time_shifter:
-                #TODO
-                logger.error('TODO: timeshifter')
-                sys.exit(3)
+            if self.__time_shifter && not self.__first_packet:
+                bit_to_send = self.get_next_bit('Time Shifter')
+
+                if bit_to_send == 0:
+                    sleep(randint(self.__zero_lower_limit, self.__zero_upper_limit)/1000)
+                elif bit_to_send == 1:
+                    sleep(randint(self.__one_lower_limit, self.__one_upper_limit)/1000)
 
         packet.accept()
+
+        self.__first_packet = True
 
 
     def get_next_bit(self, where):

@@ -2,6 +2,7 @@ from netfilterqueue import NetfilterQueue
 from scapy.all import *
 
 import logging
+import time
 
 logger = logging.getLogger('root')
 
@@ -25,6 +26,8 @@ class Receiver:
     __my_file = None
     __next_bit = 0
     __actual_byte = 0
+    __first_packet = True
+    __last_packet_arriving_time = 0
 
 
     def __init__(self, output_file, queue_number, time_shifter, fields_shifter, treshold, one_lower_limit, one_upper_limit, zero_lower_limit, zero_upper_limit, tcp_acknowledge_sequence_number_field, tcp_initial_sequence_number_field, ip_packet_identification_field, ip_do_not_fragment_field, ip_packet_identification_field_mask, tcp_initial_sequence_number_field_mask):
@@ -106,11 +109,24 @@ class Receiver:
             packet.set_payload(bytes(pkt))
 
         if self.__time_shifter:
-            #TODO
-            logger.error('TODO: timeshifter')
-            sys.exit(3)
+            if self.__first_packet:
+                self.__last_packet_arriving_time = int(round(time.time() * 1000))
+                logger.debug('Initialazing the "__last_packet_arriving_time" (' + self.__last_packet_arriving_time + ')')
+            else:
+                new_time = int(round(time.time() * 1000))
+                delay = self.__last_packet_arriving_time - new_time
+                self.__last_packet_arriving_time = new_time
+                logger.debug('New value for the "__last_packet_arriving_time" (' + self.__last_packet_arriving_time + ')')
+
+                if delay <= self.__treshold:
+                    self.add_next_bit('0', 'Time Shifter')
+                else:
+                    self.add_next_bit('1', 'Time Shifter')
 
         packet.accept()
+
+        self.__first_packet = False
+
 
     def add_next_bit(self, new_bit, where):
         logger.debug("Receiving bit '" + new_bit + "' in " + where)
