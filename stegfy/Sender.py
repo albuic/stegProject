@@ -207,7 +207,6 @@ class Sender:
                 else:
                     self.__string_or_file_sended = True
                 self.__next_byte += 1
-            self.__actual_bits = bin(ord(self.__actual_byte))[2:].zfill(8)
 
             if self.__string_or_file_sended and not self.__last_null_byte_sended and self.__input_file != None:
                 logger.log(25, 'File has been sent. Now sending a "EOT" (end of transmission) byte then nothing.\n')
@@ -220,7 +219,10 @@ class Sender:
                 return 3
 
             if self.__string_or_file_sended and not self.__last_null_byte_sended:
+                logger.debug('Set closing character ("\\x04") and __last_null_byte_sended to "True".')
                 self.__actual_byte = '\x04'
                 self.__last_null_byte_sended = True
+
+            self.__actual_bits = bin(ord(self.__actual_byte))[2:].zfill(8)
 
         return 0 if bit == '0' else 1
