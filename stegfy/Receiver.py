@@ -28,6 +28,7 @@ class Receiver:
     __actual_byte = 0
     __first_packet = True
     __last_packet_arriving_time = 0
+    __start_of_text_byte_received = False
 
 
     def __init__(self, output_file, queue_number, time_shifter, fields_shifter, treshold, one_lower_limit, one_upper_limit, zero_lower_limit, zero_upper_limit, tcp_acknowledge_sequence_number_field, tcp_initial_sequence_number_field, ip_packet_identification_field, ip_do_not_fragment_field, ip_packet_identification_field_mask, tcp_initial_sequence_number_field_mask):
@@ -132,7 +133,7 @@ class Receiver:
     def add_next_bit(self, new_bit, where):
         logger.debug('Receiving bit "' + new_bit + '" in ' + where)
 
-        logger.debug('Byte content before : ' + str(bin(self.__actual_byte)))
+        logger.log(5, 'Byte content before : ' + str(bin(self.__actual_byte)))
 
         self.__actual_byte = self.__actual_byte << 1
         if new_bit == '0':
@@ -142,10 +143,14 @@ class Receiver:
 
         logger.debug('Byte content after : ' + str(bin(self.__actual_byte)))
 
+        if self.__actual_byte == '\x02':
+            self.__start_of_text_byte_received = True
+            logger.debug('"SOT" (start of text) byte received.')
+
         if logger.getEffectiveLevel() > 24:
             sys.stderr.write('\033[F') # Cursor up one line
 
-        if self.__next_bit < 7:
+        if self.__next_bit < 7 or not self.__start_of_text_byte_received:
             logger.log(25, 'Receiving: ' + bin(self.__actual_byte)[2:].zfill(8)[7 - self.__next_bit : 8])
         else:
             logger.log(25, 'Receiving: ' + bin(self.__actual_byte)[2:].zfill(8) + '"      ("' + chr(self.__actual_byte) + '")\n')
@@ -153,8 +158,12 @@ class Receiver:
         if self.__next_bit == 7:
             logger.debug('New character received : "' + chr(self.__actual_byte) + '"')
 
+        if self.__actual_byte == '\x04':
+            logger.log(25, '"EOT" (end of transmission) byte received: Exiting')
+            exit(0)
+
         self.__next_bit += 1
-        if self.__next_bit == 8:
+        if self.__next_bit == 8 and self.__start_of_text_byte_received:
             self.__next_bit = 0
             self.__actual_byte = 0
             if self.__output_file != None:

@@ -31,6 +31,8 @@ class Sender:
     __actual_byte = None
     __actual_bits = None
     __first_packet = True
+    __string_or_file_sended = False
+    __last_null_byte_sended = False
 
 
     def __init__(self, input_file, input_string, queue_number, time_shifter, fields_shifter, treshold, one_lower_limit, one_upper_limit, zero_lower_limit, zero_upper_limit, tcp_acknowledge_sequence_number_field, tcp_initial_sequence_number_field, ip_packet_identification_field, ip_do_not_fragment_field, ip_packet_identification_field_mask, tcp_initial_sequence_number_field_mask):
@@ -53,13 +55,7 @@ class Sender:
 
         if self.__input_file:
             self.__my_file = open(self.__input_file, 'r')
-            self.__actual_byte = self.__my_file.read(1)
-            if self.__actual_byte == '':
-                logger.error('File "' + self.__input_file + '" is empty')
-                self.__my_file.close()
-                sys.exit(3)
-        else:
-            self.__actual_byte = self.__input_string[0]
+        self.__actual_byte = '\x02'
 
         self.__actual_bits = bin(ord(self.__actual_byte))[2:].zfill(8)
 
@@ -76,7 +72,7 @@ class Sender:
         nfqueue.unbind()
 
     def handler(self, packet):
-        if not ( (self.__input_file != None) and (self.__actual_byte == '') ) and not ( (self.__input_string != None) and (len(self.__input_string) < self.__next_byte + 1) ):
+        if not self.__string_or_file_sended and not self.__last_null_byte_sended:
             payload = packet.get_payload()
             try:
                 pkt = IP(payload)
@@ -115,6 +111,8 @@ class Sender:
                                         pkt[TCP].seq = pkt[TCP].seq & ( (2**32-1)-(2**(31-index)) )
                                     elif bit_to_send == 1:
                                         pkt[TCP].seq = pkt[TCP].seq | (2**(31-index))
+                                    else:
+                                        pass # Nothing to send
                             del pkt[TCP].chksum
                             pkt = pkt.__class__(bytes(pkt))
                         else:
@@ -131,6 +129,8 @@ class Sender:
                                 pkt.id = pkt.id & ( (2**16-1)-(2**(15-index)) )
                             elif bit_to_send == 1:
                                 pkt.id = pkt.id | (2**(15-index))
+                            else:
+                                pass # Nothing to send
 
                 if self.__ip_do_not_fragment_field:
                     bit_to_send = self.get_next_bit('IP Do Not Fragment field')
@@ -139,6 +139,8 @@ class Sender:
                         pkt[IP].flags = 0
                     elif bit_to_send == 1:
                         pkt[IP].flags = 2
+                    else:
+                        pass # Nothing to send
 
                 del pkt.chksum
                 pkt = pkt.__class__(bytes(pkt))
@@ -167,6 +169,8 @@ class Sender:
                     delay = randint(self.__one_lower_limit, self.__one_upper_limit)/1000
                     logger.debug('Using a delay of "' + str(delay) + '" seconds.')
                     sleep(delay)
+                else:
+                    pass # Nothing to send
 
         packet.accept()
 
@@ -196,15 +200,25 @@ class Sender:
                 self.__actual_byte = self.__my_file.read(1)
                 if self.__actual_byte == '':
                     self.__my_file.close()
+                    self.__string_or_file_sended = True
             else:
-                self.__next_byte += 1
                 if len(self.__input_string) > self.__next_byte:
                     self.__actual_byte = self.__input_string[self.__next_byte]
+                else:
+                    self.__string_or_file_sended = True
+                self.__next_byte += 1
             self.__actual_bits = bin(ord(self.__actual_byte))[2:].zfill(8)
 
-            if (self.__input_file != None) and (self.__actual_byte == ''):
-                logger.log(25, 'File has been sent.\nNow sending everything without any encoding.')
-            elif (self.__input_string != None) and (len(self.__input_string) < self.__next_byte + 1):
-                logger.log(25, 'String has been sent.\nNow sending everything without any encoding.')
+            if self.__string_or_file_sended and not self.__last_null_byte_sended and self.__input_file != None:
+                logger.log(25, 'File has been sent. Now sending a "EOT" (end of transmission) byte then nothing.\n')
+            elif self.__string_or_file_sended and not self.__last_null_byte_sended and self.__input_string != None:
+                logger.log(25, 'String has been sent. Now sending a "EOT" (end of transmission) byte then nothing.\n')
+            if self.__string_or_file_sended and self.__last_null_byte_sended:
+                logger.debug('File or String has been sent. Nothing to send.')
+                self.__next_bit = 7
+                return 3
+            if self.__string_or_file_sended and not self.__last_null_byte_sended:
+                self.__actual_byte = '\x04'
+                self.__last_null_byte_sended = True
 
         return 0 if bit == '0' else 1
