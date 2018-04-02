@@ -163,8 +163,12 @@ class Receiver:
             logger.debug('New character received : "' + chr(self.__actual_byte) + '"')
 
         if self.__actual_byte == 4 and self.__next_bit == 7:
-            logger.log(25, '"EOT" (end of transmission) byte received: Exiting')
-            sys.exit(0)
+            logger.log(25, '"EOT" (end of transmission) byte received: Reinitialising')
+            self.__my_file = None
+            self.__next_bit = 0
+            self.__actual_byte = 0
+            self.__start_of_text_byte_received = False
+
 
         self.__next_bit += 1
         if self.__next_bit == 8:
