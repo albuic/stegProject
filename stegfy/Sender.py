@@ -72,7 +72,7 @@ class Sender:
         nfqueue.unbind()
 
     def handler(self, packet):
-        if not self.__string_or_file_sended or not self.__last_null_byte_sended or not self.__next_bit == 7:
+        if not self.__string_or_file_sended or not self.__last_null_byte_sended or not self.__next_bit == 8:
             payload = packet.get_payload()
             try:
                 pkt = IP(payload)
@@ -194,34 +194,35 @@ class Sender:
         #sys.stderr.flush()
 
         self.__next_bit += 1
-        if self.__next_bit == 8:
+        if self.__next_bit >= 8:
             self.__next_bit = 0
-            if self.__input_file != None:
-                self.__actual_byte = self.__my_file.read(1)
-                if self.__actual_byte == '':
-                    self.__my_file.close()
-                    self.__string_or_file_sended = True
-            else:
-                if len(self.__input_string) > self.__next_byte:
-                    self.__actual_byte = self.__input_string[self.__next_byte]
+            if not self.__string_or_file_sended:
+                if self.__input_file != None:
+                    self.__actual_byte = self.__my_file.read(1)
+                    if self.__actual_byte == '':
+                        self.__my_file.close()
+                        self.__string_or_file_sended = True
                 else:
-                    self.__string_or_file_sended = True
-                self.__next_byte += 1
+                    if len(self.__input_string) > self.__next_byte:
+                        self.__actual_byte = self.__input_string[self.__next_byte]
+                    else:
+                        self.__string_or_file_sended = True
+                    self.__next_byte += 1
 
-            if self.__string_or_file_sended and not self.__last_null_byte_sended and self.__input_file != None:
-                logger.log(25, 'File has been sent. Now sending a "EOT" (end of transmission) byte then nothing.\n')
-            elif self.__string_or_file_sended and not self.__last_null_byte_sended and self.__input_string != None:
-                logger.log(25, 'String has been sent. Now sending a "EOT" (end of transmission) byte then nothing.\n')
+            if self.__string_or_file_sended:
+                if not self.__last_null_byte_sended:
+                    if self.__input_file != None:
+                        logger.log(25, 'File has been sent. Now sending a "EOT" (end of transmission) byte then nothing.\n')
+                    elif self.__input_string != None:
+                        logger.log(25, 'String has been sent. Now sending a "EOT" (end of transmission) byte then nothing.\n')
+                    logger.debug('Set closing character ("\\x04") and __last_null_byte_sended to "True".')
+                    self.__actual_byte = '\x04'
 
-            if self.__string_or_file_sended and self.__last_null_byte_sended:
-                logger.debug('File or String has been sent. Nothing to send.')
-                self.__next_bit = 7
-                return 3
-
-            if self.__string_or_file_sended and not self.__last_null_byte_sended:
-                logger.debug('Set closing character ("\\x04") and __last_null_byte_sended to "True".')
-                self.__actual_byte = '\x04'
-                self.__last_null_byte_sended = True
+                    self.__last_null_byte_sended = True
+                else:
+                    logger.debug('File or String has been sent. Nothing to send.')
+                    self.__next_bit = 8
+                    return 3
 
             self.__actual_bits = bin(ord(self.__actual_byte))[2:].zfill(8)
 
