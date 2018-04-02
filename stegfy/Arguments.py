@@ -327,4 +327,5 @@ class Arguments:
               "Exemple:                                                                             \n"
               "    sudo ./stegphy.py -s 'Hello world !'                                             \n"
               "    sudo ./stegphy.py --receiver --fields-shifter --ip-packet-identification-field   \n"
-              "    sudo ./main.py --sender --fields-shifter --ip-packet-identification-field --ip-mask '0010000000000001' --ip-do-not-fragment-field --tcp-initial-sequence-number-field --tcp-mask '00001000000000010000000000000001' --input-string 'heywhatsup'\n")
+              "    sudo ./main.py --sender --fields-shifter --ip-packet-identification-field --ip-mask '0010000000000001' --ip-do-not-fragment-field --tcp-initial-sequence-number-field --tcp-mask '00001000000000010000000000000001' --time-shifter -w 0 -x 300 -y 800 -z 1000 -t 500 --input-string 'heywhatsup' \n"
+              "    sudo ./main.py --receiver --fields-shifter --ip-packet-identification-field --ip-mask '0010000000000001' --ip-do-not-fragment-field --tcp-initial-sequence-number-field --tcp-mask '00001000000000010000000000000001' --time-shifter -w 0 -x 300 -y 800 -z 1000 -t 500 \n")
