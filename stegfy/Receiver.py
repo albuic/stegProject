@@ -118,6 +118,7 @@ class Receiver:
                 self.__last_packet_arriving_time = new_time
                 logger.debug('New value for the "__last_packet_arriving_time" (' + str(self.__last_packet_arriving_time) + ')')
 
+                logger.debug('Delay : ' + str(delay) + ' milliseconds (and treshold is ' + str(self.__treshold) + ' milliseconds)')
                 if delay <= self.__treshold:
                     self.add_next_bit('0', 'Time Shifter')
                 else:
