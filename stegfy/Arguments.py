@@ -117,16 +117,16 @@ class Arguments:
                     logger.error('Treshold "' + arg + '" is not an integer.')
                     sys.exit(2)
                 self.time_shifter = True
-            elif opt in ('-1', '--tcp-acknowledge-sequence-number-field'):
+            elif opt in ('-3', '--tcp-acknowledge-sequence-number-field'):
                 self.tcp_acknowledge_sequence_number_field = True
                 self.fields_shifter = True
-            elif opt in ('-2', '--tcp-initial-sequence-number-field'):
+            elif opt in ('-4', '--tcp-initial-sequence-number-field'):
                 self.tcp_initial_sequence_number_field = True
                 self.fields_shifter = True
-            elif opt in ('-3', '--ip-packet-identification-field'):
+            elif opt in ('-1', '--ip-packet-identification-field'):
                 self.ip_packet_identification_field = True
                 self.fields_shifter = True
-            elif opt in ('-4', '--ip-do-not-fragment-field'):
+            elif opt in ('-2', '--ip-do-not-fragment-field'):
                 self.ip_do_not_fragment_field = True
                 self.fields_shifter = True
             elif opt in ('--time-shifter'):
@@ -142,6 +142,7 @@ class Arguments:
                         logger.error('Mask "' + arg + '" contained unkown character(s).')
                         sys.exit(2)
                 self.ip_packet_identification_field_mask = arg
+                self.fields_shifter = True
             elif opt in ('-n', '--tcp-mask'):
                 if len(arg) != 32:
                     logger.error('Mask "' + arg + '" is not a 32 character string representing a TCP Initial Sequence Number field mask.')
@@ -151,6 +152,7 @@ class Arguments:
                         logger.error('Mask "' + arg + '" contained unkown character(s).')
                         sys.exit(2)
                 self.tcp_initial_sequence_number_field_mask = arg
+                self.fields_shifter = True
 
 
     def test_and_show_configuration(self):
@@ -285,18 +287,18 @@ class Arguments:
               "                                                            Default : 100                                           \n"
               "    '--fields-shifter'                                    Activate fields shifting with default parameters          \n"
               "                                                            Default : Not activated                                 \n"
-              "    '-1' or '--tcp-acknowledge-sequence-number-field'     Using the 'Acknowledge Sequence Number field'             \n"
+              "    '-1' or '--ip-packet-identification-field'            Using the 'Packet Identification field'                   \n"
               "                                                            Default : Not activated                                 \n"
-              "    '-2' or '--tcp-initial-sequence-number-field'         Using the 'Initial Sequence Number field'                 \n"
-              "                                                            Default : Not activated                                 \n"
-              "    '-3' or '--ip-packet-identification-field'            Using the 'Packet Identification field'                   \n"
-              "                                                            Default : Not activated                                 \n"
-              "    '-4' or '--ip-do-not-fragment-field'                  Using the 'Do Not Fragment field'                         \n"
-              "                                                            Default : Not activated but used if no other are set    \n"
-              "                                                                      and '--fields-shifter' is set                 \n"
               "    'm <mask>' or '--ip-mask <mask>'                      A string representing a 16 bit mask to set which bit of   \n"
               "                                                          the IP Identification field to use                        \n"
               "                                                            Default : '0000000000000001'                            \n"
+              "    '-2' or '--ip-do-not-fragment-field'                  Using the 'Do Not Fragment field'                         \n"
+              "                                                            Default : Not activated but used if no other are set    \n"
+              "                                                                      and '--fields-shifter' is set                 \n"
+              "    '-3' or '--tcp-acknowledge-sequence-number-field'     Using the 'Acknowledge Sequence Number field'             \n"
+              "                                                            Default : Not activated (NOT IMPLEMENTED)               \n"
+              "    '-4' or '--tcp-initial-sequence-number-field'         Using the 'Initial Sequence Number field'                 \n"
+              "                                                            Default : Not activated                                 \n"
               "    'n <mask>' or '--tcp-mask <mask>'                     A string representing a 32 bit mask to set which bit of   \n"
               "                                                          the TCP Initial Sequence Number field to use              \n"
               "                                                            Default : '11111111111111111111111111111111'            \n"
@@ -323,5 +325,6 @@ class Arguments:
               "                                                                                     \n"
               "                                                                                     \n"
               "Exemple:                                                                             \n"
-              "    ./stegphy.py -s 'Hello world !'                                                  \n"
-              "    ./stegphy.py --receiver --fields-shifter --ip-packet-identification-field        \n")
+              "    sudo ./stegphy.py -s 'Hello world !'                                             \n"
+              "    sudo ./stegphy.py --receiver --fields-shifter --ip-packet-identification-field   \n"
+              "    sudo ./main.py --sender --fields-shifter --ip-packet-identification-field --ip-mask '0010000000000001' --ip-do-not-fragment-field --tcp-initial-sequence-number-field --tcp-mask '00001000000000010000000000000001' --input-string 'heywhatsup'\n")
