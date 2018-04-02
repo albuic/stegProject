@@ -72,7 +72,7 @@ class Sender:
         nfqueue.unbind()
 
     def handler(self, packet):
-        if not self.__string_or_file_sended or not self.__last_null_byte_sended:
+        if not self.__string_or_file_sended or not self.__last_null_byte_sended or not self.__next_bit == 7:
             payload = packet.get_payload()
             try:
                 pkt = IP(payload)
