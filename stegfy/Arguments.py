@@ -40,7 +40,7 @@ class Arguments:
 
     def get_arguments(self, argv):
         try:
-            if argv[0] != "sudo":
+            if argv[0] != 'sudo':
                 opts, args = getopt.getopt(argv[1:], 'hi:o:q:rst:v:w:x:y:z:1234m:n:', ['help', 'verbose=', 'receiver', 'sender', 'input-file=', 'output-file=', 'queue-number=', 'one-lower-limit=', 'one-upper-limit=', 'input-string=', 'treshold=', 'time-shifter', 'fields-shifter', 'zero-lower-limit=', 'zero-upper-limit=', 'tcp-acknowledge-sequence-number-field', 'tcp-initial-sequence-number-field', 'ip-packet-identification-field', 'ip-do-not-fragment-field', 'ip-mask=', 'tcp-mask='])
             else:
                 opts, args = getopt.getopt(argv[2:], 'hi:o:q:rst:v:w:x:y:z:1234m:n:', ['help', 'verbose=', 'receiver', 'sender', 'input-file=', 'output-file=', 'queue-number=', 'one-lower-limit=', 'one-upper-limit=', 'input-string=', 'treshold=', 'time-shifter', 'fields-shifter', 'zero-lower-limit=', 'zero-upper-limit=', 'tcp-acknowledge-sequence-number-field', 'tcp-initial-sequence-number-field', 'ip-packet-identification-field', 'ip-do-not-fragment-field', 'ip-mask=' 'tcp-mask='])
@@ -177,13 +177,13 @@ class Arguments:
             logger.error('Cannot use both sender and receiver mode at the same time.')
             sys.exit(2)
         elif self.sender:
-            logger.debug("Using sender mode.")
+            logger.debug('Using sender mode.')
         elif self.receiver:
-            logger.debug("Using receiver mode.")
+            logger.debug('Using receiver mode.')
         else:
-            logger.warning("Receiver or Sender mode not set.")
+            logger.warning('Receiver or Sender mode not set.')
             self.receiver = True
-            logger.warning("Using receiver mode as default mode.")
+            logger.warning('Using receiver mode as default mode.')
 
         logger.debug('Using queue : "' + str(self.queue_number) + '".')
 
@@ -208,9 +208,9 @@ class Arguments:
 
         # Testing Time Shifter or Fields Shifter
         if not self.time_shifter and not self.fields_shifter:
-            log.warning("Time Shifter or Fields Shifter mode not set.")
+            log.warning('Time Shifter or Fields Shifter mode not set.')
             self.time_shifter = True
-            log.warning("Using Time Shifter as a default mode.")
+            log.warning('Using Time Shifter as a default mode.')
 
         # Testing lower/upper limits and treshold (Time Shifter setup)
         if self.time_shifter:
@@ -220,11 +220,11 @@ class Arguments:
             if self.one_lower_limit > self.one_upper_limit:
                 logger.error('The one lower limit ("' + str(self.one_lower_limit) + '") is greater than the one upper limit ("' + str(self.one_upper_limit) + '").')
                 sys.exit(2)
-            logger.debug("The treshold is " + str(self.treshold) + ".\n"
-                  "The one lower limit is " + str(self.one_lower_limit) + ".\n"
-                  "The one upper limit is " + str(self.one_upper_limit) + ".\n"
-                  "The zero lower limit is " + str(self.zero_lower_limit) + ".\n"
-                  "The zero upper limit is " + str(self.zero_upper_limit) + ".\n")
+            logger.debug('The treshold is ' + str(self.treshold) + '.\n'
+                  'The one lower limit is ' + str(self.one_lower_limit) + '.\n'
+                  'The one upper limit is ' + str(self.one_upper_limit) + '.\n'
+                  'The zero lower limit is ' + str(self.zero_lower_limit) + '.\n'
+                  'The zero upper limit is ' + str(self.zero_upper_limit) + '.\n')
             if self.one_lower_limit < self.treshold:
                 logger.warning('The one lower limit ("' + str(self.one_lower_limit) + '") is lower than the treshold ("' + str(self.treshold) + '").')
             if self.zero_upper_limit > self.treshold:
@@ -240,9 +240,9 @@ class Arguments:
                                and not self.tcp_acknowledge_sequence_number_field \
                                and not self.ip_do_not_fragment_field \
                                and not self.ip_packet_identification_field:
-            logger.warning("Fields Shifter is set but no fields are set to be used.")
+            logger.warning('Fields Shifter is set but no fields are set to be used.')
             self.ip_do_not_fragment_field = True
-            logger.warning("Using the IP Do Not Fragment Field as a default.")
+            logger.warning('Using the IP Do Not Fragment Field as a default.')
 
 
     @staticmethod

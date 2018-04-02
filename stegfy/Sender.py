@@ -54,7 +54,7 @@ class Sender:
         if self.__input_file:
             self.__my_file = open(self.__input_file, 'r')
             self.__actual_byte = self.__my_file.read(1)
-            if self.__actual_byte == "":
+            if self.__actual_byte == '':
                 logger.error('File "' + self.__input_file + '" is empty')
                 self.__my_file.close()
                 sys.exit(3)
@@ -76,7 +76,7 @@ class Sender:
         nfqueue.unbind()
 
     def handler(self, packet):
-        if not ( (self.__input_file != None) and (self.__actual_byte == "") ) and not ( (self.__input_string != None) and (len(self.__input_string) < self.__next_byte + 1) ):
+        if not ( (self.__input_file != None) and (self.__actual_byte == '') ) and not ( (self.__input_string != None) and (len(self.__input_string) < self.__next_byte + 1) ):
             payload = packet.get_payload()
             try:
                 pkt = IP(payload)
@@ -108,7 +108,7 @@ class Sender:
                         if pkt[TCP].flags & 0x02:
                             logger.info('Packet is an initial connection packet, using the TCP Initial Sequence Number field.')
                             for index, my_char in enumerate(self.__tcp_initial_sequence_number_field_mask):
-                                if my_char == "1":
+                                if my_char == '1':
                                     bit_to_send = self.get_next_bit('TCP Initial Sequence Number field')
 
                                     if bit_to_send == 0:
@@ -124,7 +124,7 @@ class Sender:
 
                 if self.__ip_packet_identification_field:
                     for index, my_char in enumerate(self.__ip_packet_identification_field_mask):
-                        if my_char == "1":
+                        if my_char == '1':
                             bit_to_send = self.get_next_bit('IP Packet Identification field')
 
                             if bit_to_send == 0:
@@ -172,17 +172,17 @@ class Sender:
     def get_next_bit(self, where):
         bit = self.__actual_bits[self.__next_bit]
 
-        logger.debug("Sending bit '" + str(bit) + "' in " + where)
+        logger.debug('Sending bit "' + str(bit) + '" in ' + where)
 
         if logger.getEffectiveLevel() > 24:
-            sys.stderr.write("\033[F") # Cursor up one line
+            sys.stderr.write('\033[F') # Cursor up one line
         if self.__next_bit < 7:
-            logger.log(25, "Sending: " + self.__actual_bits[0 : self.__next_bit + 1])
+            logger.log(25, 'Sending: ' + self.__actual_bits[0 : self.__next_bit + 1])
         else:
-            logger.log(25, "Sending: " + self.__actual_bits[0 : self.__next_bit + 1] + "  ('" + self.__actual_byte + "')\n")
+            logger.log(25, 'Sending: ' + self.__actual_bits[0 : self.__next_bit + 1] + '  ("' + self.__actual_byte + '")\n')
 
         if self.__next_bit == 7:
-            logger.debug("New character sended : '" + str(self.__actual_byte) + "'")
+            logger.debug('New character sended : "' + str(self.__actual_byte) + '"')
         #sys.stderr.flush()
 
         self.__next_bit += 1
@@ -190,7 +190,7 @@ class Sender:
             self.__next_bit = 0
             if self.__input_file != None:
                 self.__actual_byte = self.__my_file.read(1)
-                if self.__actual_byte == "":
+                if self.__actual_byte == '':
                     self.__my_file.close()
             else:
                 self.__next_byte += 1
@@ -198,7 +198,7 @@ class Sender:
                     self.__actual_byte = self.__input_string[self.__next_byte]
             self.__actual_bits = bin(ord(self.__actual_byte))[2:].zfill(8)
 
-            if (self.__input_file != None) and (self.__actual_byte == ""):
+            if (self.__input_file != None) and (self.__actual_byte == ''):
                 logger.log(25, 'File has been sent.\nNow sending everything without any encoding.')
             elif (self.__input_string != None) and (len(self.__input_string) < self.__next_byte + 1):
                 logger.log(25, 'String has been sent.\nNow sending everything without any encoding.')

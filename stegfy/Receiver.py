@@ -91,7 +91,7 @@ class Receiver:
                     if pkt[TCP].flags & 0x02:
                         logger.info('Packet is an initial connection packet, using the TCP Initial Sequence Number field.')
                         for index, my_char in enumerate(self.__tcp_initial_sequence_number_field_mask):
-                            if my_char == "1":
+                            if my_char == '1':
                                 new_bit = bin(pkt[TCP].seq)[2:].zfill(32)[index]
                                 self.add_next_bit(new_bit, 'TCP Initial Sequence Number field')
                     else:
@@ -129,9 +129,9 @@ class Receiver:
 
 
     def add_next_bit(self, new_bit, where):
-        logger.debug("Receiving bit '" + new_bit + "' in " + where)
+        logger.debug('Receiving bit "' + new_bit + '" in ' + where)
 
-        logger.debug("Byte content before : " + str(bin(self.__actual_byte)))
+        logger.debug('Byte content before : ' + str(bin(self.__actual_byte)))
 
         self.__actual_byte = self.__actual_byte << 1
         if new_bit == '0':
@@ -139,18 +139,18 @@ class Receiver:
         else:
             self.__actual_byte = self.__actual_byte | 0b00000001
 
-        logger.debug("Byte content after : " + str(bin(self.__actual_byte)))
+        logger.debug('Byte content after : ' + str(bin(self.__actual_byte)))
 
         if logger.getEffectiveLevel() > 24:
-            sys.stderr.write("\033[F") # Cursor up one line
+            sys.stderr.write('\033[F') # Cursor up one line
 
         if self.__next_bit < 7:
-            logger.log(25, "Receiving: " + bin(self.__actual_byte)[2:].zfill(8)[7 - self.__next_bit : 8])
+            logger.log(25, 'Receiving: ' + bin(self.__actual_byte)[2:].zfill(8)[7 - self.__next_bit : 8])
         else:
-            logger.log(25, "Receiving: " + bin(self.__actual_byte)[2:].zfill(8) + "      ('" + chr(self.__actual_byte) + "')\n")
+            logger.log(25, 'Receiving: ' + bin(self.__actual_byte)[2:].zfill(8) + '"      ("' + chr(self.__actual_byte) + '")\n')
 
         if self.__next_bit == 7:
-            logger.debug("New character received : '" + chr(self.__actual_byte) + "'")
+            logger.debug('New character received : "' + chr(self.__actual_byte) + '"')
 
         self.__next_bit += 1
         if self.__next_bit == 8:
