@@ -109,9 +109,9 @@ class Sender:
                                     bit_to_send = self.get_next_bit('TCP Initial Sequence Number field')
 
                                     if bit_to_send == 0:
-                                        pkt[TCP].seq = pkt[TCP].seq & ( (2**32-1)-(2**index) )
+                                        pkt[TCP].seq = pkt[TCP].seq & ( (2**32-1)-(2**(31-index)) )
                                     elif bit_to_send == 1:
-                                        pkt[TCP].seq = pkt[TCP].seq | (2**index)
+                                        pkt[TCP].seq = pkt[TCP].seq | (2**(31-index))
                             del pkt[TCP].chksum
                             pkt = pkt.__class__(bytes(pkt))
                         else:
@@ -125,9 +125,9 @@ class Sender:
                             bit_to_send = self.get_next_bit('IP Packet Identification field')
 
                             if bit_to_send == 0:
-                                pkt.id = pkt.id & ( (2**32-1)-(2**index) )
+                                pkt.id = pkt.id & ( (2**16-1)-(2**(15-index)) )
                             elif bit_to_send == 1:
-                                pkt.id = pkt.id | (2**index)
+                                pkt.id = pkt.id | (2**(15-index))
 
                 if self.__ip_do_not_fragment_field:
                     bit_to_send = self.get_next_bit('IP Do Not Fragment field')
