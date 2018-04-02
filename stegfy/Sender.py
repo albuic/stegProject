@@ -160,9 +160,13 @@ class Sender:
                 bit_to_send = self.get_next_bit('Time Shifter')
 
                 if bit_to_send == 0:
-                    sleep(randint(self.__zero_lower_limit, self.__zero_upper_limit)/1000)
+                    delay = randint(self.__zero_lower_limit, self.__zero_upper_limit)/1000
+                    logger.debug('Using a delay of "' + str(delay) + '" seconds.')
+                    sleep(delay)
                 elif bit_to_send == 1:
-                    sleep(randint(self.__one_lower_limit, self.__one_upper_limit)/1000)
+                    delay = randint(self.__one_lower_limit, self.__one_upper_limit)/1000
+                    logger.debug('Using a delay of "' + str(delay) + '" seconds.')
+                    sleep(delay)
 
         packet.accept()
 
