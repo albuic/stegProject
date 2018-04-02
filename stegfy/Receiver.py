@@ -133,7 +133,7 @@ class Receiver:
     def add_next_bit(self, new_bit, where):
         logger.debug('Receiving bit "' + new_bit + '" in ' + where)
 
-        logger.log(5, 'Byte content before : ' + str(bin(self.__actual_byte)))
+        logger.log(5, 'Byte content before : ' + bin(self.__actual_byte)[2:].zfill(8))
 
         self.__actual_byte = self.__actual_byte << 1
         if new_bit == '0':
@@ -141,17 +141,21 @@ class Receiver:
         else:
             self.__actual_byte = self.__actual_byte | 0b00000001
 
-        logger.debug('Byte content after : ' + str(bin(self.__actual_byte)))
+        logger.debug('Byte content after : ' + bin(self.__actual_byte)[2:].zfill(8))
 
-        if self.__actual_byte == '\x02':
+        if self.__next_bit == 7 and self.__actual_byte == 2:
             self.__start_of_text_byte_received = True
             logger.debug('"SOT" (start of text) byte received.')
 
         if logger.getEffectiveLevel() > 24:
             sys.stderr.write('\033[F') # Cursor up one line
 
-        if self.__next_bit < 7 or not self.__start_of_text_byte_received:
+        if self.__next_bit < 7:
             logger.log(25, 'Receiving: ' + bin(self.__actual_byte)[2:].zfill(8)[7 - self.__next_bit : 8])
+        elif not self.__start_of_text_byte_received:
+            logger.log(25, 'Receiving: ' + bin(self.__actual_byte)[2:].zfill(8) + '"      ("' + chr(self.__actual_byte) + '")')
+            self.__next_bit -= 1
+            self.__actual_byte = self.__actual_byte & 0b01111111
         else:
             logger.log(25, 'Receiving: ' + bin(self.__actual_byte)[2:].zfill(8) + '"      ("' + chr(self.__actual_byte) + '")\n')
 
@@ -163,7 +167,7 @@ class Receiver:
             exit(0)
 
         self.__next_bit += 1
-        if self.__next_bit == 8 and self.__start_of_text_byte_received:
+        if self.__next_bit == 8:
             self.__next_bit = 0
             self.__actual_byte = 0
             if self.__output_file != None:
