@@ -156,7 +156,7 @@ class Sender:
                     pkt.show()
                 logger.log(5, '*****************************')
 
-            if self.__time_shifter && not self.__first_packet:
+            if self.__time_shifter and not self.__first_packet:
                 bit_to_send = self.get_next_bit('Time Shifter')
 
                 if bit_to_send == 0:
