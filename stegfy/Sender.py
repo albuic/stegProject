@@ -88,8 +88,8 @@ class Sender:
                 logger.debug('Before: packet.id : ' + str(pkt.id))
                 logger.debug('Before: packet.chksum : ' + str(pkt.chksum))
                 if TCP in pkt:
-                    logger.debug('Before: packet[TCP].seq : ' + str(pkt[TCP].seq))
-                    logger.debug('Before: packet[TCP].chksum : ' + str(pkt[TCP].chksum))
+                    logger.debug('Before: packet[TCP].seq : ' + str(pkt[TCP].seq) + '  =  ' + str(bin(pkt[TCP].seq)))
+                    logger.debug('Before: packet[TCP].chksum : ' + str(pkt[TCP].chksum) + '  =  ' + str(bin(pkt[TCP].chksum)))
                 if logger.getEffectiveLevel() < 6:
                     pkt.show()
                 logger.log(5, '****************************')
@@ -111,7 +111,7 @@ class Sender:
                                     if bit_to_send == 0:
                                         pkt[TCP].seq = pkt[TCP].seq & ( (2**32-1)-(2**index) )
                                     elif bit_to_send == 1:
-                                        pkt[TCP].seq = pkt[TCP].seq & (2**index)
+                                        pkt[TCP].seq = pkt[TCP].seq | (2**index)
                             del pkt[TCP].chksum
                             pkt = pkt.__class__(bytes(pkt))
                         else:
@@ -127,7 +127,7 @@ class Sender:
                             if bit_to_send == 0:
                                 pkt.id = pkt.id & ( (2**32-1)-(2**index) )
                             elif bit_to_send == 1:
-                                pkt.id = pkt.id & (2**index)
+                                pkt.id = pkt.id | (2**index)
 
                 if self.__ip_do_not_fragment_field:
                     bit_to_send = self.get_next_bit('IP Do Not Fragment field')

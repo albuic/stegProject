@@ -71,8 +71,8 @@ class Receiver:
             logger.debug('Content: packet.id : ' + str(pkt.id))
             logger.debug('Content: packet.chksum : ' + str(pkt.chksum))
             if TCP in pkt:
-                logger.debug('Content: packet[TCP].seq : ' + str(pkt[TCP].seq))
-                logger.debug('Content: packet[TCP].chksum : ' + str(pkt[TCP].chksum))
+                logger.debug('Content: packet[TCP].seq : ' + str(pkt[TCP].seq) + '  =  ' + str(bin(pkt[TCP].seq)))
+                logger.debug('Content: packet[TCP].chksum : ' + str(pkt[TCP].chksum) + '  =  ' + str(bin(pkt[TCP].chksum)))
             if logger.getEffectiveLevel() < 6:
                 pkt.show()
             logger.log(5, '****************************')
