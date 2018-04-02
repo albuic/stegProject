@@ -178,7 +178,8 @@ class Sender:
 
 
     def get_next_bit(self, where):
-        bit = self.__actual_bits[self.__next_bit]
+        if self.__next_bit <= 7:
+            bit = self.__actual_bits[self.__next_bit]
 
         logger.debug('Sending bit "' + str(bit) + '" in ' + where)
 
