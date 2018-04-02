@@ -166,7 +166,7 @@ class Sender:
 
         packet.accept()
 
-        self.__first_packet = True
+        self.__first_packet = False
 
 
     def get_next_bit(self, where):
